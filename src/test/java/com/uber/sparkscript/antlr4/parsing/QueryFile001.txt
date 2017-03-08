@@ -1,0 +1,6 @@
+var_current_date = 'current_date()';
+
+t1 = select ${var_current_date} as date;
+
+
+
