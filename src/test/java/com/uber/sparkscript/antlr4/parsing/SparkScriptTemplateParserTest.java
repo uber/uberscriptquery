@@ -21,131 +21,131 @@ import org.junit.Test;
 
 public class SparkScriptTemplateParserTest {
 
-  @Test
-  public void test_parse() {
-    {
-      String query = "v1 = 'abc'; v2 = \"def\";";
+    @Test
+    public void test_parse() {
+        {
+            String query = "v1 = 'abc'; v2 = \"def\";";
 
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(2, root.getVariableMap().size());
-      Assert.assertEquals("abc", root.getVariableMap().get("v1"));
-      Assert.assertEquals("def", root.getVariableMap().get("v2"));
-      Assert.assertEquals("", root.getTemplateBody());
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(2, root.getVariableMap().size());
+            Assert.assertEquals("abc", root.getVariableMap().get("v1"));
+            Assert.assertEquals("def", root.getVariableMap().get("v2"));
+            Assert.assertEquals("", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = 'abc'; v2 = \"def\"; body";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(2, root.getVariableMap().size());
+            Assert.assertEquals("abc", root.getVariableMap().get("v1"));
+            Assert.assertEquals("def", root.getVariableMap().get("v2"));
+            Assert.assertEquals(" body", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = 'abc'; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(2, root.getVariableMap().size());
+            Assert.assertEquals("abc", root.getVariableMap().get("v1"));
+            Assert.assertEquals("def", root.getVariableMap().get("v2"));
+            Assert.assertEquals(" ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"", root.getTemplateBody());
+        }
+
+        {
+            String query = "v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(0, root.getVariableMap().size());
+            Assert.assertEquals("v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"", root.getTemplateBody());
+        }
     }
-    {
-      String query = "v1 = 'abc'; v2 = \"def\"; body";
 
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(2, root.getVariableMap().size());
-      Assert.assertEquals("abc", root.getVariableMap().get("v1"));
-      Assert.assertEquals("def", root.getVariableMap().get("v2"));
-      Assert.assertEquals(" body", root.getTemplateBody());
+    @Test
+    public void test_parse_table_assignement() {
+        {
+            String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2;";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(0, root.getVariableMap().size());
+            Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2;", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(0, root.getVariableMap().size());
+            Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c", root.getTemplateBody());
+        }
     }
-    {
-      String query = "v1 = 'abc'; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
 
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(2, root.getVariableMap().size());
-      Assert.assertEquals("abc", root.getVariableMap().get("v1"));
-      Assert.assertEquals("def", root.getVariableMap().get("v2"));
-      Assert.assertEquals(" ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"", root.getTemplateBody());
+    @Test
+    public void test_parse_reference_variable_inside_variable() {
+        {
+            String query = "v1 = 'abc'; v2 = \"d${v1}f\"; body";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(2, root.getVariableMap().size());
+            Assert.assertEquals("abc", root.getVariableMap().get("v1"));
+            Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
+            Assert.assertEquals(" body", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = 'abc'; v2 = \"d${v1}f\"; v3 = '1${v2}2'; body -- ${v1}, ${v2}, ${v3} --";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(3, root.getVariableMap().size());
+            Assert.assertEquals("abc", root.getVariableMap().get("v1"));
+            Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
+            Assert.assertEquals("1dabcf2", root.getVariableMap().get("v3"));
+            Assert.assertEquals(" body -- abc, dabcf, 1dabcf2 --", root.getTemplateBody());
+        }
     }
 
-    {
-      String query = "v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
+    @Test
+    public void test_parse_special_characters() {
+        {
+            String query = "v1 = '\"abc\"';body";
 
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(0, root.getVariableMap().size());
-      Assert.assertEquals("v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"", root.getTemplateBody());
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(1, root.getVariableMap().size());
+            Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
+            Assert.assertEquals("body", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = \"'abc'\";body";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(1, root.getVariableMap().size());
+            Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
+            Assert.assertEquals("body", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = '\\'abc\\'';body";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(1, root.getVariableMap().size());
+            Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
+            Assert.assertEquals("body", root.getTemplateBody());
+        }
+        {
+            String query = "v1 = \"\\\"abc\\\"\";body";
+
+            SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
+            SparkScriptTemplateParseResult root = parser.parse(query);
+            Assert.assertEquals(1, root.getVariableMap().size());
+            Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
+            Assert.assertEquals("body", root.getTemplateBody());
+        }
     }
-  }
-
-  @Test
-  public void test_parse_table_assignement() {
-    {
-      String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2;";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(0, root.getVariableMap().size());
-      Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2;", root.getTemplateBody());
-    }
-    {
-      String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(0, root.getVariableMap().size());
-      Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c", root.getTemplateBody());
-    }
-  }
-
-  @Test
-  public void test_parse_reference_variable_inside_variable() {
-    {
-      String query = "v1 = 'abc'; v2 = \"d${v1}f\"; body";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(2, root.getVariableMap().size());
-      Assert.assertEquals("abc", root.getVariableMap().get("v1"));
-      Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
-      Assert.assertEquals(" body", root.getTemplateBody());
-    }
-    {
-      String query = "v1 = 'abc'; v2 = \"d${v1}f\"; v3 = '1${v2}2'; body -- ${v1}, ${v2}, ${v3} --";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(3, root.getVariableMap().size());
-      Assert.assertEquals("abc", root.getVariableMap().get("v1"));
-      Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
-      Assert.assertEquals("1dabcf2", root.getVariableMap().get("v3"));
-      Assert.assertEquals(" body -- abc, dabcf, 1dabcf2 --", root.getTemplateBody());
-    }
-  }
-
-  @Test
-  public void test_parse_special_characters() {
-    {
-      String query = "v1 = '\"abc\"';body";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(1, root.getVariableMap().size());
-      Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
-      Assert.assertEquals("body", root.getTemplateBody());
-    }
-    {
-      String query = "v1 = \"'abc'\";body";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(1, root.getVariableMap().size());
-      Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
-      Assert.assertEquals("body", root.getTemplateBody());
-    }
-    {
-      String query = "v1 = '\\'abc\\'';body";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(1, root.getVariableMap().size());
-      Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
-      Assert.assertEquals("body", root.getTemplateBody());
-    }
-    {
-      String query = "v1 = \"\\\"abc\\\"\";body";
-
-      SparkScriptTemplateParser parser = new SparkScriptTemplateParser();
-      SparkScriptTemplateParseResult root = parser.parse(query);
-      Assert.assertEquals(1, root.getVariableMap().size());
-      Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
-      Assert.assertEquals("body", root.getTemplateBody());
-    }
-  }
 }

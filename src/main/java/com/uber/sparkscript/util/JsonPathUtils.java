@@ -22,22 +22,22 @@ import com.jayway.jsonpath.Option;
 
 public class JsonPathUtils {
 
-	public static String getJsonPathAsString(String json, String path) {
-		Configuration conf = Configuration.defaultConfiguration().addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL).addOptions(Option.SUPPRESS_EXCEPTIONS);
-		Object document = conf.jsonProvider().parse(json);
-		Object jsonObj = JsonPath.read(document, path);
-		return convertJsonPathValueToString(jsonObj);
-	}
+    public static String getJsonPathAsString(String json, String path) {
+        Configuration conf = Configuration.defaultConfiguration().addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL).addOptions(Option.SUPPRESS_EXCEPTIONS);
+        Object document = conf.jsonProvider().parse(json);
+        Object jsonObj = JsonPath.read(document, path);
+        return convertJsonPathValueToString(jsonObj);
+    }
 
-	private static String convertJsonPathValueToString(Object jsonPathValue) {
-		if (jsonPathValue == null) {
-			return null;
-		}
+    private static String convertJsonPathValueToString(Object jsonPathValue) {
+        if (jsonPathValue == null) {
+            return null;
+        }
 
-		if (jsonPathValue instanceof String) {
-			return (String)jsonPathValue;
-		}
+        if (jsonPathValue instanceof String) {
+            return (String) jsonPathValue;
+        }
 
-		return JsonUtils.serialize(jsonPathValue);
-	}
+        return JsonUtils.serialize(jsonPathValue);
+    }
 }

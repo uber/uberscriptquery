@@ -17,38 +17,38 @@
 package com.uber.sparkscript.antlr4.parsing;
 
 public class ActionParamValue {
-  private ValueType valueType;
-  private Object value;
+    private ValueType valueType;
+    private Object value;
 
-  public ActionParamValue() {
-  }
+    public ActionParamValue() {
+    }
 
-  public ActionParamValue(ValueType valueType, Object value) {
-    this.valueType = valueType;
-    this.value = value;
-  }
+    public ActionParamValue(ValueType valueType, Object value) {
+        this.valueType = valueType;
+        this.value = value;
+    }
 
-  public ValueType getValueType() {
-    return valueType;
-  }
+    public ValueType getValueType() {
+        return valueType;
+    }
 
-  public void setValueType(ValueType valueType) {
-    this.valueType = valueType;
-  }
+    public void setValueType(ValueType valueType) {
+        this.valueType = valueType;
+    }
 
-  public Object getValue() {
-    return value;
-  }
+    public Object getValue() {
+        return value;
+    }
 
-  public void setValue(Object value) {
-    this.value = value;
-  }
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
-  @Override
-  public String toString() {
-    return "ActionParamValue{" +
-            "valueType=" + valueType +
-            ", value=" + value +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "ActionParamValue{" +
+                "valueType=" + valueType +
+                ", value=" + value +
+                '}';
+    }
 }

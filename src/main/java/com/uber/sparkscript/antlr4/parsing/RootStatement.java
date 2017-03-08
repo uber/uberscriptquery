@@ -23,63 +23,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RootStatement implements java.io.Serializable {
-  private List<FileAssignment> fileAssignments = new ArrayList<>();
-  private List<StatementAssignment> jsonQueryStatementAssignments = new ArrayList<>();
-  private List<StatementAssignment> statementAssignments = new ArrayList<>();
-  private List<ActionStatement> actionStatements = new ArrayList<>();
+    private List<FileAssignment> fileAssignments = new ArrayList<>();
+    private List<StatementAssignment> jsonQueryStatementAssignments = new ArrayList<>();
+    private List<StatementAssignment> statementAssignments = new ArrayList<>();
+    private List<ActionStatement> actionStatements = new ArrayList<>();
 
-  private CounterMap tableReferenceCount = new CounterMap();
+    private CounterMap tableReferenceCount = new CounterMap();
 
-  public List<FileAssignment> getFileAssignments() {
-    return fileAssignments;
-  }
+    public List<FileAssignment> getFileAssignments() {
+        return fileAssignments;
+    }
 
-  public void setFileAssignments(List<FileAssignment> fileAssignments) {
-    this.fileAssignments = fileAssignments;
-  }
+    public void setFileAssignments(List<FileAssignment> fileAssignments) {
+        this.fileAssignments = fileAssignments;
+    }
 
-  public List<StatementAssignment> getJsonQueryStatementAssignments() {
-    return jsonQueryStatementAssignments;
-  }
+    public List<StatementAssignment> getJsonQueryStatementAssignments() {
+        return jsonQueryStatementAssignments;
+    }
 
-  public void setJsonQueryStatementAssignments(List<StatementAssignment> jsonQueryStatementAssignments) {
-    this.jsonQueryStatementAssignments = jsonQueryStatementAssignments;
-  }
+    public void setJsonQueryStatementAssignments(List<StatementAssignment> jsonQueryStatementAssignments) {
+        this.jsonQueryStatementAssignments = jsonQueryStatementAssignments;
+    }
 
-  public List<StatementAssignment> getStatementAssignments() {
-    return statementAssignments;
-  }
+    public List<StatementAssignment> getStatementAssignments() {
+        return statementAssignments;
+    }
 
-  public void setStatementAssignments(List<StatementAssignment> statementAssignments) {
-    this.statementAssignments = statementAssignments;
-  }
+    public void setStatementAssignments(List<StatementAssignment> statementAssignments) {
+        this.statementAssignments = statementAssignments;
+    }
 
-  public List<ActionStatement> getActionStatements() {
-    return actionStatements;
-  }
+    public List<ActionStatement> getActionStatements() {
+        return actionStatements;
+    }
 
-  public void setActionStatements(List<ActionStatement> actionStatements) {
-    this.actionStatements = actionStatements;
-  }
+    public void setActionStatements(List<ActionStatement> actionStatements) {
+        this.actionStatements = actionStatements;
+    }
 
 
-  @JsonIgnore
-  public CounterMap getTableReferenceCount() {
-    return tableReferenceCount;
-  }
+    @JsonIgnore
+    public CounterMap getTableReferenceCount() {
+        return tableReferenceCount;
+    }
 
-  public void setTableReferenceCount(CounterMap tableReferenceCount) {
-    this.tableReferenceCount = tableReferenceCount;
-  }
+    public void setTableReferenceCount(CounterMap tableReferenceCount) {
+        this.tableReferenceCount = tableReferenceCount;
+    }
 
-  @Override
-  public String toString() {
-    return "RootStatement{" +
-            "fileAssignments=" + fileAssignments +
-            ", jsonQueryStatementAssignments=" + jsonQueryStatementAssignments +
-            ", statementAssignments=" + statementAssignments +
-            ", actionStatements=" + actionStatements +
-            ", tableReferenceCount=" + tableReferenceCount +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "RootStatement{" +
+                "fileAssignments=" + fileAssignments +
+                ", jsonQueryStatementAssignments=" + jsonQueryStatementAssignments +
+                ", statementAssignments=" + statementAssignments +
+                ", actionStatements=" + actionStatements +
+                ", tableReferenceCount=" + tableReferenceCount +
+                '}';
+    }
 }

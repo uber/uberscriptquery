@@ -21,7 +21,7 @@ package org.apache.spark.sql;
 import org.apache.spark.sql.execution.datasources.jdbc.DriverRegistry;
 
 public class DriverRegistryWrapper {
-  public static void register(String className) {
-    DriverRegistry.register(className);
-  }
+    public static void register(String className) {
+        DriverRegistry.register(className);
+    }
 }

@@ -27,12 +27,11 @@ import java.util.concurrent.Callable
 import java.util.concurrent.atomic.AtomicLong
 
 import com.uber.sparkscript.jdbc.SingleTableJdbcWriter
-import com.uber.sparkscript.util.{SqlUtils, SparkUtils, ExponentialBackoffRetryPolicy}
-import org.apache.commons.lang3.exception.ExceptionUtils
+import com.uber.sparkscript.util.{ExponentialBackoffRetryPolicy, SqlUtils}
 import org.apache.spark.internal.Logging
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.jdbc.{JdbcDialect, JdbcDialects, JdbcType}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame}
 import org.spark_project.guava.util.concurrent.RateLimiter
 
 import scala.collection.JavaConverters._
@@ -40,14 +39,14 @@ import scala.collection.JavaConverters._
 object JdbcWriterUtils extends Logging {
 
   def saveTable(
-                  df: DataFrame,
-                  url: String,
-                  table: String,
-                  textColumns: Seq[String],
-                  postWriteSql: String,
-                  retry: Boolean,
-                  writesPerSecond: Double,
-                  properties: Properties) {
+                 df: DataFrame,
+                 url: String,
+                 table: String,
+                 textColumns: Seq[String],
+                 postWriteSql: String,
+                 retry: Boolean,
+                 writesPerSecond: Double,
+                 properties: Properties) {
     val dialect = JdbcDialects.get(url)
     val nullTypes: Array[Int] = df.schema.fields.map { field =>
       getJdbcType(field.dataType, dialect).jdbcNullType
@@ -56,7 +55,7 @@ object JdbcWriterUtils extends Logging {
     val rddSchema = df.schema
     val columnNames = rddSchema.fields.map(_.name).toSeq.asJava
 
-    val mapPartitionsResult = df.rdd.mapPartitions{ iterator =>
+    val mapPartitionsResult = df.rdd.mapPartitions { iterator =>
       logInfo(s"UberJdbcUtils.saveTable: $table")
       val rateLimiter = RateLimiter.create(writesPerSecond);
       try {
@@ -99,26 +98,9 @@ object JdbcWriterUtils extends Logging {
     }
   }
 
-  private def createConnectionFactory(url: String, properties: Properties): () => Connection = {
-    val userSpecifiedDriverClass = Option(properties.getProperty("driver"))
-    userSpecifiedDriverClass.foreach(DriverRegistry.register)
-    // Performing this part of the logic on the driver guards against the corner-case where the
-    // driver returned for a URL is different on the driver and executors due to classpath
-    // differences.
-    val driverClass: String = userSpecifiedDriverClass.getOrElse {
-      DriverManager.getDriver(url).getClass.getCanonicalName
-    }
-    () => {
-      userSpecifiedDriverClass.foreach(DriverRegistry.register)
-      val driver: Driver = DriverManager.getDrivers.asScala.collectFirst {
-        case d: DriverWrapper if d.wrapped.getClass.getCanonicalName == driverClass => d
-        case d if d.getClass.getCanonicalName == driverClass => d
-      }.getOrElse {
-        throw new IllegalStateException(
-          s"Did not find registered driver with class $driverClass")
-      }
-      driver.connect(url, properties)
-    }
+  private def getJdbcType(dt: DataType, dialect: JdbcDialect): JdbcType = {
+    dialect.getJDBCType(dt).orElse(getCommonJDBCType(dt)).getOrElse(
+      throw new IllegalArgumentException(s"Can't get JDBC type for ${dt.simpleString}"))
   }
 
   private def getCommonJDBCType(dt: DataType): Option[JdbcType] = {
@@ -140,9 +122,26 @@ object JdbcWriterUtils extends Logging {
     }
   }
 
-  private def getJdbcType(dt: DataType, dialect: JdbcDialect): JdbcType = {
-    dialect.getJDBCType(dt).orElse(getCommonJDBCType(dt)).getOrElse(
-      throw new IllegalArgumentException(s"Can't get JDBC type for ${dt.simpleString}"))
+  private def createConnectionFactory(url: String, properties: Properties): () => Connection = {
+    val userSpecifiedDriverClass = Option(properties.getProperty("driver"))
+    userSpecifiedDriverClass.foreach(DriverRegistry.register)
+    // Performing this part of the logic on the driver guards against the corner-case where the
+    // driver returned for a URL is different on the driver and executors due to classpath
+    // differences.
+    val driverClass: String = userSpecifiedDriverClass.getOrElse {
+      DriverManager.getDriver(url).getClass.getCanonicalName
+    }
+    () => {
+      userSpecifiedDriverClass.foreach(DriverRegistry.register)
+      val driver: Driver = DriverManager.getDrivers.asScala.collectFirst {
+        case d: DriverWrapper if d.wrapped.getClass.getCanonicalName == driverClass => d
+        case d if d.getClass.getCanonicalName == driverClass => d
+      }.getOrElse {
+        throw new IllegalStateException(
+          s"Did not find registered driver with class $driverClass")
+      }
+      driver.connect(url, properties)
+    }
   }
 
 }

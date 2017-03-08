@@ -23,22 +23,22 @@ import java.nio.file.Paths;
 
 public class FileUtils {
 
-  public static String getSymbolicLinkTargetFile(String path) {
-    Path result = getSymbolicLinkTargetFile(Paths.get(path));
-    return result.toString();
-  }
-
-  public static Path getSymbolicLinkTargetFile(Path path) {
-    if (!Files.isSymbolicLink(path)) {
-      return path;
+    public static String getSymbolicLinkTargetFile(String path) {
+        Path result = getSymbolicLinkTargetFile(Paths.get(path));
+        return result.toString();
     }
 
-    try {
-      Path targetPath = Files.readSymbolicLink(path);
-      return getSymbolicLinkTargetFile(targetPath);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read symbolic link: " + path, e);
+    public static Path getSymbolicLinkTargetFile(Path path) {
+        if (!Files.isSymbolicLink(path)) {
+            return path;
+        }
+
+        try {
+            Path targetPath = Files.readSymbolicLink(path);
+            return getSymbolicLinkTargetFile(targetPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read symbolic link: " + path, e);
+        }
     }
-  }
 
 }

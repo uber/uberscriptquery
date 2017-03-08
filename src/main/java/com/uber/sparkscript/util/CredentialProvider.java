@@ -19,5 +19,5 @@ package com.uber.sparkscript.util;
 import java.io.Serializable;
 
 public interface CredentialProvider extends Serializable {
-  String getPassword(String passwordFile, String passwordEntry);
+    String getPassword(String passwordFile, String passwordEntry);
 }

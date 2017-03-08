@@ -24,30 +24,30 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class JsonFileCredentialProvider implements java.io.Serializable, CredentialProvider {
-  private static final Logger logger = LoggerFactory.getLogger(JsonFileCredentialProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonFileCredentialProvider.class);
 
-  @Override
-  public String getPassword(String passwordFile, String passwordEntry) {
-    if (passwordFile == null || passwordFile.isEmpty()) {
-      throw new RuntimeException("passwordFile is null or empty");
-    }
+    @Override
+    public String getPassword(String passwordFile, String passwordEntry) {
+        if (passwordFile == null || passwordFile.isEmpty()) {
+            throw new RuntimeException("passwordFile is null or empty");
+        }
 
-    String passwordFileOriginalValue = passwordFile;
-    passwordFile = com.uber.sparkscript.util.FileUtils.getSymbolicLinkTargetFile(passwordFile);
-    logger.info(String.format("Reading password file: %s (%s)", passwordFileOriginalValue, passwordFile));
-    String password;
-    final String fileContent;
-    try (FileReader fileReader = new FileReader(passwordFile)) {
-      fileContent = IOUtils.toString(fileReader);
-    } catch (IOException e) {
-      throw new RuntimeException(String.format("Failed to read password file %s on current machine %s", passwordFile, NetworkUtils.getLocalHostName()), e);
-    }
-    if (passwordEntry == null || passwordEntry.isEmpty()) {
-      password = fileContent;
-    } else {
-      password = JsonPathUtils.getJsonPathAsString(fileContent, passwordEntry);
-    }
+        String passwordFileOriginalValue = passwordFile;
+        passwordFile = com.uber.sparkscript.util.FileUtils.getSymbolicLinkTargetFile(passwordFile);
+        logger.info(String.format("Reading password file: %s (%s)", passwordFileOriginalValue, passwordFile));
+        String password;
+        final String fileContent;
+        try (FileReader fileReader = new FileReader(passwordFile)) {
+            fileContent = IOUtils.toString(fileReader);
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Failed to read password file %s on current machine %s", passwordFile, NetworkUtils.getLocalHostName()), e);
+        }
+        if (passwordEntry == null || passwordEntry.isEmpty()) {
+            password = fileContent;
+        } else {
+            password = JsonPathUtils.getJsonPathAsString(fileContent, passwordEntry);
+        }
 
-    return password;
-  }
+        return password;
+    }
 }

@@ -25,14 +25,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class JsonFileCredentialProviderTest {
-  @Test
-  public void test_addPassword() throws IOException {
-    File file = File.createTempFile("test_password_file", ".json");
-    file.deleteOnExit();
+    @Test
+    public void test_addPassword() throws IOException {
+        File file = File.createTempFile("test_password_file", ".json");
+        file.deleteOnExit();
 
-    FileUtils.write(file, "{'aa':{'bb':'cc'}}");
+        FileUtils.write(file, "{'aa':{'bb':'cc'}}");
 
-    JsonFileCredentialProvider credentialManager = new JsonFileCredentialProvider();
-    Assert.assertEquals("cc", credentialManager.getPassword(file.getAbsolutePath(), "$.aa.bb"));
-  }
+        JsonFileCredentialProvider credentialManager = new JsonFileCredentialProvider();
+        Assert.assertEquals("cc", credentialManager.getPassword(file.getAbsolutePath(), "$.aa.bb"));
+    }
 }

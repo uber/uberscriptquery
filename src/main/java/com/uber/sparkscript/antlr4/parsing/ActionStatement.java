@@ -20,31 +20,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActionStatement {
-  private String functionName;
-  private List<ActionParamValue> paramValues = new ArrayList<>();
+    private String functionName;
+    private List<ActionParamValue> paramValues = new ArrayList<>();
 
-  public String getFunctionName() {
-    return functionName;
-  }
+    public String getFunctionName() {
+        return functionName;
+    }
 
-  public void setFunctionName(String functionName) {
-    this.functionName = functionName;
-  }
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
 
-  public List<ActionParamValue> getParamValues() {
-    return paramValues;
-  }
+    public List<ActionParamValue> getParamValues() {
+        return paramValues;
+    }
 
-  public void setParamValues(List<ActionParamValue> paramValues) {
-    this.paramValues = paramValues;
-  }
+    public void setParamValues(List<ActionParamValue> paramValues) {
+        this.paramValues = paramValues;
+    }
 
-  @Override
-  public String toString() {
-    return "ActionStatement{" +
-            "functionName='" + functionName + '\'' +
-            ", paramValues=" + paramValues +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "ActionStatement{" +
+                "functionName='" + functionName + '\'' +
+                ", paramValues=" + paramValues +
+                '}';
+    }
 }
 

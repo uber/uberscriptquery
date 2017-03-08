@@ -17,5 +17,5 @@
 package com.uber.sparkscript.antlr4.parsing;
 
 public enum ValueType {
-  String, Table
+    String, Table
 }

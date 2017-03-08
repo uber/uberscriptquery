@@ -17,31 +17,31 @@
 package com.uber.sparkscript.execution;
 
 public class CredentialEntry implements java.io.Serializable {
-  private String passwordFile;
-  private String passwordEntry;
-  private String passwordValue;
+    private String passwordFile;
+    private String passwordEntry;
+    private String passwordValue;
 
-  public String getPasswordFile() {
-    return passwordFile;
-  }
+    public String getPasswordFile() {
+        return passwordFile;
+    }
 
-  public void setPasswordFile(String passwordFile) {
-    this.passwordFile = passwordFile;
-  }
+    public void setPasswordFile(String passwordFile) {
+        this.passwordFile = passwordFile;
+    }
 
-  public String getPasswordEntry() {
-    return passwordEntry;
-  }
+    public String getPasswordEntry() {
+        return passwordEntry;
+    }
 
-  public void setPasswordEntry(String passwordEntry) {
-    this.passwordEntry = passwordEntry;
-  }
+    public void setPasswordEntry(String passwordEntry) {
+        this.passwordEntry = passwordEntry;
+    }
 
-  public String getPasswordValue() {
-    return passwordValue;
-  }
+    public String getPasswordValue() {
+        return passwordValue;
+    }
 
-  public void setPasswordValue(String passwordValue) {
-    this.passwordValue = passwordValue;
-  }
+    public void setPasswordValue(String passwordValue) {
+        this.passwordValue = passwordValue;
+    }
 }

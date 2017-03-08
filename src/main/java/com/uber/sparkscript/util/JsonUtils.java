@@ -26,39 +26,40 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonUtils {
-  protected static ObjectMapper mapper = new ObjectMapper();
+    protected static ObjectMapper mapper = new ObjectMapper();
 
-  static {
-    mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-    mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
-    mapper.configure(Feature.ALLOW_COMMENTS, true);
-  }
-
-  public static String serialize(Object obj) {
-    if(obj == null) {
-      return "";
-    } else {
-      try {
-        return mapper.writeValueAsString(obj);
-      } catch (JsonProcessingException ex) {
-        throw new RuntimeException(String.format("Failed to serialize %s (%s)", obj, obj.getClass()), ex);
-      }
+    static {
+        mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        mapper.configure(Feature.ALLOW_SINGLE_QUOTES, true);
+        mapper.configure(Feature.ALLOW_COMMENTS, true);
     }
-  }
 
-  public static <T> T deserialize(String content, Class<T> valueType) {
-    try {
-      return mapper.readValue(content, valueType);
-    } catch (IOException ex) {
-      throw new RuntimeException(String.format("Failed to deserialize %s from json %s", valueType, content), ex);
+    public static String serialize(Object obj) {
+        if (obj == null) {
+            return "";
+        } else {
+            try {
+                return mapper.writeValueAsString(obj);
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(String.format("Failed to serialize %s (%s)", obj, obj.getClass()), ex);
+            }
+        }
     }
-  }
 
-  public static <T> List<T> deserializeList(String content, Class<T> valueType) {
-    try {
-      return mapper.readValue(content, new TypeReference<List<T>>(){});
-    } catch (IOException ex) {
-      throw new RuntimeException(String.format("Failed to deserialize %s from json %s", valueType, content), ex);
+    public static <T> T deserialize(String content, Class<T> valueType) {
+        try {
+            return mapper.readValue(content, valueType);
+        } catch (IOException ex) {
+            throw new RuntimeException(String.format("Failed to deserialize %s from json %s", valueType, content), ex);
+        }
     }
-  }
+
+    public static <T> List<T> deserializeList(String content, Class<T> valueType) {
+        try {
+            return mapper.readValue(content, new TypeReference<List<T>>() {
+            });
+        } catch (IOException ex) {
+            throw new RuntimeException(String.format("Failed to deserialize %s from json %s", valueType, content), ex);
+        }
+    }
 }

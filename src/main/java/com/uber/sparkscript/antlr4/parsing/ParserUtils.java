@@ -17,16 +17,16 @@
 package com.uber.sparkscript.antlr4.parsing;
 
 public class ParserUtils {
-  public static String getStringStatementInnerValue(String variableValue) {
-    // remove quote from value, and handle character escape
-    // TODO handle more character escapes rather than \' and \"
-    if (variableValue.startsWith("'")) {
-      variableValue = variableValue.substring(1, variableValue.length() - 1);
-      variableValue = variableValue.replace("\\'", "'");
-    } else if (variableValue.startsWith("\"")) {
-      variableValue = variableValue.substring(1, variableValue.length() - 1);
-      variableValue = variableValue.replace("\\\"", "\"");
+    public static String getStringStatementInnerValue(String variableValue) {
+        // remove quote from value, and handle character escape
+        // TODO handle more character escapes rather than \' and \"
+        if (variableValue.startsWith("'")) {
+            variableValue = variableValue.substring(1, variableValue.length() - 1);
+            variableValue = variableValue.replace("\\'", "'");
+        } else if (variableValue.startsWith("\"")) {
+            variableValue = variableValue.substring(1, variableValue.length() - 1);
+            variableValue = variableValue.replace("\\\"", "\"");
+        }
+        return variableValue;
     }
-    return variableValue;
-  }
 }

@@ -39,208 +39,204 @@ import java.util.List;
 import java.util.Map;
 
 public class SparkScriptEngine implements Serializable {
-  private static final Logger logger = LoggerFactory.getLogger(SparkScriptEngine.class);
+    public final static String DATAGEN_week_timepoints_by_10_minutes = "week_timepoints_by_10_minutes";
+    public final static String DATAGEN_numbers_1k = "numbers_1k";
+    private static final Logger logger = LoggerFactory.getLogger(SparkScriptEngine.class);
+    private CredentialProvider credentialManager = new DummyCredentialProvider();
 
-  public final static String DATAGEN_week_timepoints_by_10_minutes = "week_timepoints_by_10_minutes";
+    private Map<String, SqlInputStatementExecutor> sqlInputStatementExecutors = new HashMap<>();
+    private Map<String, JsonInputStatementExecutor> jsonInputStatementExecutors = new HashMap<>();
 
-  public final static String DATAGEN_numbers_1k = "numbers_1k";
+    private Map<String, ActionStatementExecutor> actionStatementExecutors = new HashMap<>();
 
-  private CredentialProvider credentialManager = new DummyCredentialProvider();
+    public SparkScriptEngine() {
+        sqlInputStatementExecutors.put("jdbc", new JdbcSqlInputStatementExecutor());
 
-  private Map<String, SqlInputStatementExecutor> sqlInputStatementExecutors = new HashMap<>();
-  private Map<String, JsonInputStatementExecutor> jsonInputStatementExecutors = new HashMap<>();
-  
-  private Map<String, ActionStatementExecutor> actionStatementExecutors = new HashMap<>();
-
-  public SparkScriptEngine() {
-    sqlInputStatementExecutors.put("jdbc", new JdbcSqlInputStatementExecutor());
-
-    actionStatementExecutors.put(PrintTableActionStatementExecutor.ACTION_NAME, new PrintTableActionStatementExecutor());
-    actionStatementExecutors.put(WriteJdbcActionStatementExecutor.ACTION_NAME, new WriteJdbcActionStatementExecutor());
-    actionStatementExecutors.put(WriteCsvFileActionStatementExecutor.ACTION_NAME, new WriteCsvFileActionStatementExecutor());
-    actionStatementExecutors.put(WriteJsonFileActionStatementExecutor.ACTION_NAME, new WriteJsonFileActionStatementExecutor());
-    actionStatementExecutors.put(WriteParquetFileActionStatementExecutor.ACTION_NAME, new WriteParquetFileActionStatementExecutor());
-    actionStatementExecutors.put(SendMailGunEmailActionStatementExecutor.ACTION_NAME, new SendMailGunEmailActionStatementExecutor());
-  }
-
-  public void setCredentialProvider(CredentialProvider credentialManager) {
-    this.credentialManager = credentialManager;
-  }
-
-  public void addSqlInputStatementExecutor(String name, SqlInputStatementExecutor executor) {
-    sqlInputStatementExecutors.put(name.toLowerCase(), executor);
-  }
-
-  public void addJsonInputStatementExecutor(String name, JsonInputStatementExecutor executor) {
-    jsonInputStatementExecutors.put(name.toLowerCase(), executor);
-  }
-  
-  public void addActionStatementExecutor(String name, ActionStatementExecutor executor) {
-    actionStatementExecutors.put(name, executor);
-  }
-
-  public void executeScript(String query, SparkSession spark) {
-    executeScript(query, null, spark, false);
-  }
-
-  public void executeScript(String query, String queryOverwrite, SparkSession spark, boolean debug) {
-    SparkScriptSqlParser parser = new SparkScriptSqlParser();
-
-    logger.info("Parsing query statement: " + query);
-    RootStatement rootStatement = parser.parse(query, queryOverwrite).getRootStatement();
-
-    if (rootStatement.getFileAssignments() != null) {
-      for (FileAssignment fileAssignment : rootStatement.getFileAssignments()) {
-        logger.info("Processing file input: " + fileAssignment);
-        String inputFormat = fileAssignment.getFileType();
-        String inputLocation = fileAssignment.getFileLocation();
-        Dataset<Row> df = SparkUtils.loadFile(inputFormat, inputLocation, spark);
-        logger.info("Finished loading file input: " + fileAssignment);
-
-        processAndRegisterTempTable(df, rootStatement, fileAssignment.getTableAlias(), fileAssignment.toString(), debug);
-      }
+        actionStatementExecutors.put(PrintTableActionStatementExecutor.ACTION_NAME, new PrintTableActionStatementExecutor());
+        actionStatementExecutors.put(WriteJdbcActionStatementExecutor.ACTION_NAME, new WriteJdbcActionStatementExecutor());
+        actionStatementExecutors.put(WriteCsvFileActionStatementExecutor.ACTION_NAME, new WriteCsvFileActionStatementExecutor());
+        actionStatementExecutors.put(WriteJsonFileActionStatementExecutor.ACTION_NAME, new WriteJsonFileActionStatementExecutor());
+        actionStatementExecutors.put(WriteParquetFileActionStatementExecutor.ACTION_NAME, new WriteParquetFileActionStatementExecutor());
+        actionStatementExecutors.put(SendMailGunEmailActionStatementExecutor.ACTION_NAME, new SendMailGunEmailActionStatementExecutor());
     }
-    
-    if (rootStatement.getJsonQueryStatementAssignments() != null) {
-      for (StatementAssignment statementAssignment : rootStatement.getJsonQueryStatementAssignments()) {
-        logger.info("Processing query statement: " + statementAssignment);
-        JsonInputStatementExecutor jsonInputStatementExecutor = jsonInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
-        if (jsonInputStatementExecutor == null) {
-          throw new RuntimeException("Not supported json query engine: " + statementAssignment.getQueryEngine());
+
+    private static Dataset<Row> generateData_week_timepoints_by_10_minutes(SparkSession spark) {
+        StructField[] structFields = new StructField[1];
+        org.apache.spark.sql.types.DataType dataType = DataTypes.IntegerType;
+        String column = "timepoint";
+        StructField structField = new StructField(column, dataType, true, Metadata.empty());
+        structFields[0] = structField;
+
+        StructType structType = new StructType(structFields);
+
+        List<Row> rows = new ArrayList<>();
+
+        int weekTotalMinutes = 7 * 24 * 60;
+        int timepointIntervalMinutes = 10;
+        for (int i = 0; i < weekTotalMinutes / timepointIntervalMinutes; i++) {
+            Object[] objects = new Object[structFields.length];
+            objects[0] = i;
+            Row row = RowFactory.create(objects);
+            rows.add(row);
         }
 
-        Dataset<Row> df = jsonInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
-        logger.info("Finished query statement: " + statementAssignment);
-
-        processAndRegisterTempTable(df, rootStatement, statementAssignment.getTableAlias(), statementAssignment.toString(), debug);
-      }
+        Dataset<Row> df = spark.createDataFrame(rows, structType);
+        return df;
     }
 
-    if (rootStatement.getStatementAssignments() != null) {
-      for (StatementAssignment statementAssignment : rootStatement.getStatementAssignments()) {
-        logger.info("Processing query statement: " + statementAssignment);
-        Dataset<Row> df;
-        if (statementAssignment.getQueryType() == null) {
-          logger.info("Running query by spark sql: " + statementAssignment.getQueryText());
-          df = spark.sql(statementAssignment.getQueryText());
-        } else if (statementAssignment.getQueryType().equalsIgnoreCase("SQL")) {
-          logger.info("Running query by SQL: " + statementAssignment);
+    private static Dataset<Row> generateData_numbers_1k(SparkSession spark) {
+        StructField[] structFields = new StructField[1];
+        org.apache.spark.sql.types.DataType dataType = DataTypes.IntegerType;
+        String column = "number";
+        StructField structField = new StructField(column, dataType, true, Metadata.empty());
+        structFields[0] = structField;
 
-          SqlInputStatementExecutor sqlInputStatementExecutor = sqlInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
-          if (sqlInputStatementExecutor == null) {
-            throw new RuntimeException("Not supported sql query engine: " + statementAssignment.getQueryEngine());
-          }
+        StructType structType = new StructType(structFields);
 
-          df = sqlInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
-        } else if (statementAssignment.getQueryType().equalsIgnoreCase("JSON")) {
-          logger.info("Running query by JSON: " + statementAssignment);
+        List<Row> rows = new ArrayList<>();
 
-          JsonInputStatementExecutor jsonInputStatementExecutor = jsonInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
-          if (jsonInputStatementExecutor == null) {
-            throw new RuntimeException("Not supported json query engine: " + statementAssignment.getQueryEngine());
-          }
+        for (int i = 0; i <= 1000; i++) {
+            Object[] objects = new Object[structFields.length];
+            objects[0] = i;
+            Row row = RowFactory.create(objects);
+            rows.add(row);
+        }
 
-          df = jsonInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
-        } else if (statementAssignment.getQueryType().equalsIgnoreCase("datagen")) {
-          logger.info("Running datagen: " + statementAssignment);
-          if (statementAssignment.getQueryEngine().equalsIgnoreCase(DATAGEN_week_timepoints_by_10_minutes)) {
-            df = generateData_week_timepoints_by_10_minutes(spark);
-          } else if (statementAssignment.getQueryEngine().equalsIgnoreCase(DATAGEN_numbers_1k)) {
-            df = generateData_numbers_1k(spark);
-          } else {
-            throw new RuntimeException("Query statement not supported for datagen: " + statementAssignment);
-          }
+        Dataset<Row> df = spark.createDataFrame(rows, structType);
+        return df;
+    }
+
+    public void setCredentialProvider(CredentialProvider credentialManager) {
+        this.credentialManager = credentialManager;
+    }
+
+    public void addSqlInputStatementExecutor(String name, SqlInputStatementExecutor executor) {
+        sqlInputStatementExecutors.put(name.toLowerCase(), executor);
+    }
+
+    public void addJsonInputStatementExecutor(String name, JsonInputStatementExecutor executor) {
+        jsonInputStatementExecutors.put(name.toLowerCase(), executor);
+    }
+
+    public void addActionStatementExecutor(String name, ActionStatementExecutor executor) {
+        actionStatementExecutors.put(name, executor);
+    }
+
+    public void executeScript(String query, SparkSession spark) {
+        executeScript(query, null, spark, false);
+    }
+
+    public void executeScript(String query, String queryOverwrite, SparkSession spark, boolean debug) {
+        SparkScriptSqlParser parser = new SparkScriptSqlParser();
+
+        logger.info("Parsing query statement: " + query);
+        RootStatement rootStatement = parser.parse(query, queryOverwrite).getRootStatement();
+
+        if (rootStatement.getFileAssignments() != null) {
+            for (FileAssignment fileAssignment : rootStatement.getFileAssignments()) {
+                logger.info("Processing file input: " + fileAssignment);
+                String inputFormat = fileAssignment.getFileType();
+                String inputLocation = fileAssignment.getFileLocation();
+                Dataset<Row> df = SparkUtils.loadFile(inputFormat, inputLocation, spark);
+                logger.info("Finished loading file input: " + fileAssignment);
+
+                processAndRegisterTempTable(df, rootStatement, fileAssignment.getTableAlias(), fileAssignment.toString(), debug);
+            }
+        }
+
+        if (rootStatement.getJsonQueryStatementAssignments() != null) {
+            for (StatementAssignment statementAssignment : rootStatement.getJsonQueryStatementAssignments()) {
+                logger.info("Processing query statement: " + statementAssignment);
+                JsonInputStatementExecutor jsonInputStatementExecutor = jsonInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
+                if (jsonInputStatementExecutor == null) {
+                    throw new RuntimeException("Not supported json query engine: " + statementAssignment.getQueryEngine());
+                }
+
+                Dataset<Row> df = jsonInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
+                logger.info("Finished query statement: " + statementAssignment);
+
+                processAndRegisterTempTable(df, rootStatement, statementAssignment.getTableAlias(), statementAssignment.toString(), debug);
+            }
+        }
+
+        if (rootStatement.getStatementAssignments() != null) {
+            for (StatementAssignment statementAssignment : rootStatement.getStatementAssignments()) {
+                logger.info("Processing query statement: " + statementAssignment);
+                Dataset<Row> df;
+                if (statementAssignment.getQueryType() == null) {
+                    logger.info("Running query by spark sql: " + statementAssignment.getQueryText());
+                    df = spark.sql(statementAssignment.getQueryText());
+                } else if (statementAssignment.getQueryType().equalsIgnoreCase("SQL")) {
+                    logger.info("Running query by SQL: " + statementAssignment);
+
+                    SqlInputStatementExecutor sqlInputStatementExecutor = sqlInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
+                    if (sqlInputStatementExecutor == null) {
+                        throw new RuntimeException("Not supported sql query engine: " + statementAssignment.getQueryEngine());
+                    }
+
+                    df = sqlInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
+                } else if (statementAssignment.getQueryType().equalsIgnoreCase("JSON")) {
+                    logger.info("Running query by JSON: " + statementAssignment);
+
+                    JsonInputStatementExecutor jsonInputStatementExecutor = jsonInputStatementExecutors.get(statementAssignment.getQueryEngine().toLowerCase());
+                    if (jsonInputStatementExecutor == null) {
+                        throw new RuntimeException("Not supported json query engine: " + statementAssignment.getQueryEngine());
+                    }
+
+                    df = jsonInputStatementExecutor.execute(spark, statementAssignment, this.credentialManager);
+                } else if (statementAssignment.getQueryType().equalsIgnoreCase("datagen")) {
+                    logger.info("Running datagen: " + statementAssignment);
+                    if (statementAssignment.getQueryEngine().equalsIgnoreCase(DATAGEN_week_timepoints_by_10_minutes)) {
+                        df = generateData_week_timepoints_by_10_minutes(spark);
+                    } else if (statementAssignment.getQueryEngine().equalsIgnoreCase(DATAGEN_numbers_1k)) {
+                        df = generateData_numbers_1k(spark);
+                    } else {
+                        throw new RuntimeException("Query statement not supported for datagen: " + statementAssignment);
+                    }
+                } else {
+                    throw new RuntimeException("Query statement not supported: " + statementAssignment);
+                }
+                logger.info("Finished query statement: " + statementAssignment);
+
+                processAndRegisterTempTable(df, rootStatement, statementAssignment.getTableAlias(), statementAssignment.toString(), debug);
+            }
+        }
+
+        SparkScriptActionEngine actionExecutor = new SparkScriptActionEngine();
+        actionExecutor.setCredentialProvider(credentialManager);
+
+        for (Map.Entry<String, ActionStatementExecutor> entry : actionStatementExecutors.entrySet()) {
+            actionExecutor.addActionStatementExecutor(entry.getKey(), entry.getValue());
+        }
+
+        for (ActionStatement actionStatement : rootStatement.getActionStatements()) {
+            logger.info("Running action statement: " + actionStatement);
+            actionExecutor.execute(actionStatement, spark);
+            logger.info("Finished action statement: " + actionStatement);
+        }
+    }
+
+    private void processAndRegisterTempTable(Dataset<Row> df, RootStatement rootStatement, String tableAlias, String logText, boolean debug) {
+        boolean dfPersisted = false;
+        long tableReferenceCount = rootStatement.getTableReferenceCount().getCount(tableAlias);
+
+        if (tableReferenceCount > 1) {
+            df = df.persist(StorageLevel.MEMORY_AND_DISK_SER());
+            dfPersisted = true;
+            logger.info(String.format("Persist table %s because it is referenced %s times", tableAlias, tableReferenceCount));
         } else {
-          throw new RuntimeException("Query statement not supported: " + statementAssignment);
+            logger.info(String.format("Do not persist table %s because it is referenced %s times", tableAlias, tableReferenceCount));
         }
-        logger.info("Finished query statement: " + statementAssignment);
 
-        processAndRegisterTempTable(df, rootStatement, statementAssignment.getTableAlias(), statementAssignment.toString(), debug);
-      }
+        df.createOrReplaceTempView(tableAlias);
+        logger.info(String.format("Registered temp view %s for query: %s", tableAlias, logText));
+
+        if (debug) {
+            if (!dfPersisted) {
+                df = df.persist(StorageLevel.MEMORY_AND_DISK_SER());
+            }
+
+            // TODO save debug info/data
+        }
     }
-
-    SparkScriptActionEngine actionExecutor = new SparkScriptActionEngine();
-    actionExecutor.setCredentialProvider(credentialManager);
-
-    for (Map.Entry<String, ActionStatementExecutor> entry : actionStatementExecutors.entrySet()) {
-      actionExecutor.addActionStatementExecutor(entry.getKey(), entry.getValue());
-    }
-
-    for (ActionStatement actionStatement : rootStatement.getActionStatements()) {
-      logger.info("Running action statement: " + actionStatement);
-      actionExecutor.execute(actionStatement, spark);
-      logger.info("Finished action statement: " + actionStatement);
-    }
-  }
-
-
-  private void processAndRegisterTempTable(Dataset<Row> df, RootStatement rootStatement, String tableAlias, String logText, boolean debug) {
-    boolean dfPersisted = false;
-    long tableReferenceCount = rootStatement.getTableReferenceCount().getCount(tableAlias);
-
-    if (tableReferenceCount > 1) {
-      df = df.persist(StorageLevel.MEMORY_AND_DISK_SER());
-      dfPersisted = true;
-      logger.info(String.format("Persist table %s because it is referenced %s times", tableAlias, tableReferenceCount));
-    } else {
-      logger.info(String.format("Do not persist table %s because it is referenced %s times", tableAlias, tableReferenceCount));
-    }
-
-    df.createOrReplaceTempView(tableAlias);
-    logger.info(String.format("Registered temp view %s for query: %s", tableAlias, logText));
-
-    if (debug) {
-      if (!dfPersisted) {
-        df = df.persist(StorageLevel.MEMORY_AND_DISK_SER());
-      }
-
-      // TODO save debug info/data
-    }
-  }
-
-  private static Dataset<Row> generateData_week_timepoints_by_10_minutes(SparkSession spark) {
-    StructField[] structFields = new StructField[1];
-    org.apache.spark.sql.types.DataType dataType = DataTypes.IntegerType;
-    String column = "timepoint";
-    StructField structField = new StructField(column, dataType, true, Metadata.empty());
-    structFields[0] = structField;
-
-    StructType structType = new StructType(structFields);
-
-    List<Row> rows = new ArrayList<>();
-
-    int weekTotalMinutes = 7 * 24 * 60;
-    int timepointIntervalMinutes = 10;
-    for (int i = 0; i < weekTotalMinutes/timepointIntervalMinutes; i++) {
-      Object[] objects = new Object[structFields.length];
-      objects[0] = i;
-      Row row = RowFactory.create(objects);
-      rows.add(row);
-    }
-
-    Dataset<Row> df = spark.createDataFrame(rows, structType);
-    return df;
-  }
-
-  private static Dataset<Row> generateData_numbers_1k(SparkSession spark) {
-    StructField[] structFields = new StructField[1];
-    org.apache.spark.sql.types.DataType dataType = DataTypes.IntegerType;
-    String column = "number";
-    StructField structField = new StructField(column, dataType, true, Metadata.empty());
-    structFields[0] = structField;
-
-    StructType structType = new StructType(structFields);
-
-    List<Row> rows = new ArrayList<>();
-
-    for (int i = 0; i <= 1000; i++) {
-      Object[] objects = new Object[structFields.length];
-      objects[0] = i;
-      Row row = RowFactory.create(objects);
-      rows.add(row);
-    }
-
-    Dataset<Row> df = spark.createDataFrame(rows, structType);
-    return df;
-  }
 }

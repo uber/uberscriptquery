@@ -20,15 +20,15 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class SqlUtilsTest {
-  @Test
-  public void test_isTableNotExistExceptionMessage() {
-    Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' doesn't exist", "airport_eta_ata_summary"));
-    Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table airport_eta_ata_summary doesn't exist", "airport_eta_ata_summary"));
+    @Test
+    public void test_isTableNotExistExceptionMessage() {
+        Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' doesn't exist", "airport_eta_ata_summary"));
+        Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table airport_eta_ata_summary doesn't exist", "airport_eta_ata_summary"));
 
-    Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' not exist", "airport_eta_ata_summary"));
-    Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table airport_eta_ata_summary not exist", "airport_eta_ata_summary"));
+        Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' not exist", "airport_eta_ata_summary"));
+        Assert.assertEquals(true, SqlUtils.isTableNotExistExceptionMessage("Table airport_eta_ata_summary not exist", "airport_eta_ata_summary"));
 
-    Assert.assertEquals(false, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' exist", "airport_eta_ata_summary"));
-    Assert.assertEquals(false, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.abc' doesn't exist", "airport_eta_ata_summary"));
-  }
+        Assert.assertEquals(false, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.airport_eta_ata_summary' exist", "airport_eta_ata_summary"));
+        Assert.assertEquals(false, SqlUtils.isTableNotExistExceptionMessage("Table 'dataquerier.abc' doesn't exist", "airport_eta_ata_summary"));
+    }
 }

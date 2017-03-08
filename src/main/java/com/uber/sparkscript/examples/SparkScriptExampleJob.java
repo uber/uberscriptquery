@@ -29,57 +29,57 @@ import scala.Tuple2;
  */
 public class SparkScriptExampleJob {
 
-  public static void main(String[] args) {
-    String query = null;
-    String queryOverwrite = null;
+    public static void main(String[] args) {
+        String query = null;
+        String queryOverwrite = null;
 
-    // Read program arguments
+        // Read program arguments
 
-    for (int i = 0; i < args.length; i++) {
-      if (args[i].equalsIgnoreCase("-query")) {
-        query = args[i + 1];
-      } else if (args[i].equalsIgnoreCase("-queryOverwrite")) {
-        queryOverwrite = args[i + 1];
-      }
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("-query")) {
+                query = args[i + 1];
+            } else if (args[i].equalsIgnoreCase("-queryOverwrite")) {
+                queryOverwrite = args[i + 1];
+            }
+        }
+
+        if (query == null) {
+            query = "message = 'Hello World'; \n"
+                    + "result = select cast(unix_timestamp() as timestamp) as time, '${message}' as message; \n"
+                    + "printTable(result);";
+        } else if (query.toLowerCase().startsWith("http://") || query.toLowerCase().startsWith("https://")) {
+            System.out.println("Fetching query from http: " + query);
+            query = HttpUtils.get(query, null).getBody();
+        }
+
+        System.out.println("Query: " + query);
+        System.out.println("Query Overwrite: " + queryOverwrite);
+
+        // Start Spark Session
+
+        String master = "local[1]";
+        String appName = "SparkScriptExampleJob";
+
+        SparkConf sparkConf = new SparkConf()
+                .setMaster(master)
+                .setAppName(appName);
+
+        SparkSession sparkSession = SparkSession
+                .builder()
+                .config(sparkConf).getOrCreate();
+
+        // Load query from hdfs if it is hdfs url
+        if (query.toLowerCase().startsWith("hdfs://")) {
+            System.out.println("Fetching query from hdfs: " + query);
+            Tuple2<String, String>[] tuples = (Tuple2<String, String>[]) sparkSession.sparkContext().wholeTextFiles(query, 1).collect();
+            query = tuples[0]._2();
+            System.out.println("Query: " + query);
+        }
+
+        // Run Spark Script query
+        SparkScriptEngine engine = new SparkScriptEngine();
+        engine.executeScript(query, queryOverwrite, sparkSession, false);
+
+        sparkSession.stop();
     }
-
-    if (query == null) {
-      query = "message = 'Hello World'; \n"
-              + "result = select cast(unix_timestamp() as timestamp) as time, '${message}' as message; \n"
-              + "printTable(result);";
-    } else if (query.toLowerCase().startsWith("http://") || query.toLowerCase().startsWith("https://")) {
-      System.out.println("Fetching query from http: " + query);
-      query = HttpUtils.get(query, null).getBody();
-    }
-
-    System.out.println("Query: " + query);
-    System.out.println("Query Overwrite: " + queryOverwrite);
-
-    // Start Spark Session
-
-    String master = "local[1]";
-    String appName = "SparkScriptExampleJob";
-
-    SparkConf sparkConf = new SparkConf()
-            .setMaster(master)
-            .setAppName(appName);
-
-    SparkSession sparkSession = SparkSession
-            .builder()
-            .config(sparkConf).getOrCreate();
-
-    // Load query from hdfs if it is hdfs url
-    if (query.toLowerCase().startsWith("hdfs://")) {
-      System.out.println("Fetching query from hdfs: " + query);
-      Tuple2<String, String>[] tuples = (Tuple2<String, String>[])sparkSession.sparkContext().wholeTextFiles(query, 1).collect();
-      query = tuples[0]._2();
-      System.out.println("Query: " + query);
-    }
-
-    // Run Spark Script query
-    SparkScriptEngine engine = new SparkScriptEngine();
-    engine.executeScript(query, queryOverwrite, sparkSession, false);
-
-    sparkSession.stop();
-  }
 }

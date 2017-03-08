@@ -23,5 +23,5 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 public interface JsonInputStatementExecutor {
-  Dataset<Row> execute(SparkSession sparkSession, StatementAssignment statementAssignment, CredentialProvider credentialManager);
+    Dataset<Row> execute(SparkSession sparkSession, StatementAssignment statementAssignment, CredentialProvider credentialManager);
 }

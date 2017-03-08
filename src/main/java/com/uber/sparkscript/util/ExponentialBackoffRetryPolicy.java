@@ -24,56 +24,56 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class ExponentialBackoffRetryPolicy<T> implements RetryPolicy<T>, java.io.Serializable {
-  private static final Logger LOG = Logger.getLogger(ExponentialBackoffRetryPolicy.class);
+    private static final Logger LOG = Logger.getLogger(ExponentialBackoffRetryPolicy.class);
 
-  private final int maximumAttemptCount;
-  private final long minimumMilliseconds;
-  private final float retryScaleFactor;
+    private final int maximumAttemptCount;
+    private final long minimumMilliseconds;
+    private final float retryScaleFactor;
 
-  public ExponentialBackoffRetryPolicy(int maximumAttemptCount, long minimumMilliseconds) {
-    this(maximumAttemptCount, minimumMilliseconds, 2.0f);
-  }
-
-  public ExponentialBackoffRetryPolicy(int maximumAttemptCount, long minimumMilliseconds, float retryScaleFactor) {
-    this.maximumAttemptCount = maximumAttemptCount;
-    this.minimumMilliseconds = minimumMilliseconds;
-    this.retryScaleFactor = retryScaleFactor;
-  }
-
-  @Override
-  public T attempt(Callable<T> callable) {
-    ThreadLocalRandom random = ThreadLocalRandom.current();
-    int remainingAttempts = maximumAttemptCount - 1;
-    long minimumSleepTime = minimumMilliseconds;
-    long maximumSleepTime = (long) (minimumSleepTime * retryScaleFactor);
-
-    Throwable previousException;
-
-    try {
-      return callable.call();
-    } catch (Throwable ex) {
-      if (remainingAttempts <= 0) {
-        throw new RuntimeException("Failed on first try and there is no remaining retry", ex);
-      }
-      previousException = ex;
+    public ExponentialBackoffRetryPolicy(int maximumAttemptCount, long minimumMilliseconds) {
+        this(maximumAttemptCount, minimumMilliseconds, 2.0f);
     }
 
-    while (remainingAttempts > 0) {
-      long sleepTime = random.nextLong(minimumSleepTime, maximumSleepTime);
-      LOG.info(String.format("Sleeping %s milliseconds and retrying on exception: %s", sleepTime, previousException));
-      Uninterruptibles.sleepUninterruptibly(sleepTime, TimeUnit.MILLISECONDS);
-      try {
-        return callable.call();
-      } catch (Throwable ex) {
-        previousException = ex;
-      }
-      remainingAttempts--;
-      minimumSleepTime *= retryScaleFactor;
-      maximumSleepTime *= retryScaleFactor;
+    public ExponentialBackoffRetryPolicy(int maximumAttemptCount, long minimumMilliseconds, float retryScaleFactor) {
+        this.maximumAttemptCount = maximumAttemptCount;
+        this.minimumMilliseconds = minimumMilliseconds;
+        this.retryScaleFactor = retryScaleFactor;
     }
 
-    String msg = String.format("Failed after tried %s times", maximumAttemptCount);
-    throw new RuntimeException(msg, previousException);
-  }
+    @Override
+    public T attempt(Callable<T> callable) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        int remainingAttempts = maximumAttemptCount - 1;
+        long minimumSleepTime = minimumMilliseconds;
+        long maximumSleepTime = (long) (minimumSleepTime * retryScaleFactor);
+
+        Throwable previousException;
+
+        try {
+            return callable.call();
+        } catch (Throwable ex) {
+            if (remainingAttempts <= 0) {
+                throw new RuntimeException("Failed on first try and there is no remaining retry", ex);
+            }
+            previousException = ex;
+        }
+
+        while (remainingAttempts > 0) {
+            long sleepTime = random.nextLong(minimumSleepTime, maximumSleepTime);
+            LOG.info(String.format("Sleeping %s milliseconds and retrying on exception: %s", sleepTime, previousException));
+            Uninterruptibles.sleepUninterruptibly(sleepTime, TimeUnit.MILLISECONDS);
+            try {
+                return callable.call();
+            } catch (Throwable ex) {
+                previousException = ex;
+            }
+            remainingAttempts--;
+            minimumSleepTime *= retryScaleFactor;
+            maximumSleepTime *= retryScaleFactor;
+        }
+
+        String msg = String.format("Failed after tried %s times", maximumAttemptCount);
+        throw new RuntimeException(msg, previousException);
+    }
 
 }

@@ -42,209 +42,209 @@ import java.util.List;
 
 public class SparkScriptActionEngineTest {
 
-  private String master = "local[1]";
-  private String appName = "spark_unit_test";
+    private String master = "local[1]";
+    private String appName = "spark_unit_test";
 
-  private SparkConf sparkConf;
-  private SparkSession sparkSession;
+    private SparkConf sparkConf;
+    private SparkSession sparkSession;
 
-  @Before
-  public void before() {
-    sparkConf = new SparkConf()
-            .setMaster(master)
-            .setAppName(appName)
-            .set("spark.driver.allowMultipleContexts", "true");
+    @Before
+    public void before() {
+        sparkConf = new SparkConf()
+                .setMaster(master)
+                .setAppName(appName)
+                .set("spark.driver.allowMultipleContexts", "true");
 
-    sparkSession = SparkSession
-            .builder()
-            .config(sparkConf).getOrCreate();
-  }
+        sparkSession = SparkSession
+                .builder()
+                .config(sparkConf).getOrCreate();
+    }
 
-  @After
-  public void after() {
-    sparkSession.stop();
-  }
+    @After
+    public void after() {
+        sparkSession.stop();
+    }
 
-  @Test
-  public void test_writeJdbc() throws IOException {
+    @Test
+    public void test_writeJdbc() throws IOException {
 
-    StructField[] structFields = new StructField[] {
-            new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
-            new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
-            new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
-            new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
-    };
+        StructField[] structFields = new StructField[]{
+                new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
+                new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
+        };
 
-    StructType structType = new StructType(structFields);
+        StructType structType = new StructType(structFields);
 
-    List<Row> rows = new ArrayList<>();
-    rows.add(RowFactory.create(1, "v1", 11L, "text1"));
-    rows.add(RowFactory.create(2, "v2", 22L, "text2"));
+        List<Row> rows = new ArrayList<>();
+        rows.add(RowFactory.create(1, "v1", 11L, "text1"));
+        rows.add(RowFactory.create(2, "v2", 22L, "text2"));
 
-    Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
-    df.registerTempTable("df1");
+        Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
+        df.registerTempTable("df1");
 
-    ActionStatement actionStatement = new ActionStatement();
-    actionStatement.setFunctionName("writeJdbc");
+        ActionStatement actionStatement = new ActionStatement();
+        actionStatement.setFunctionName("writeJdbc");
 
-    File file = File.createTempFile("h2dbfile", ".db");
-    file.deleteOnExit();
+        File file = File.createTempFile("h2dbfile", ".db");
+        file.deleteOnExit();
 
-    String connectionString = String.format("jdbc:h2:%s;DB_CLOSE_DELAY=-1;MODE=MySQL", file.getAbsolutePath());
+        String connectionString = String.format("jdbc:h2:%s;DB_CLOSE_DELAY=-1;MODE=MySQL", file.getAbsolutePath());
 
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, connectionString));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "result1"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "INTcolumn"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "STRINGcolumn,LONGcolumn"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "textColumn"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "2"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "100000"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, ""));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, connectionString));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "result1"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "INTcolumn"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "STRINGcolumn,LONGcolumn"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "textColumn"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "2"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "100000"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, ""));
 
 
-    SparkScriptActionEngine executor = new SparkScriptActionEngine();
-    executor.addActionStatementExecutor(WriteJdbcActionStatementExecutor.ACTION_NAME, new WriteJdbcActionStatementExecutor());
-    executor.execute(actionStatement, sparkSession);
+        SparkScriptActionEngine executor = new SparkScriptActionEngine();
+        executor.addActionStatementExecutor(WriteJdbcActionStatementExecutor.ACTION_NAME, new WriteJdbcActionStatementExecutor());
+        executor.execute(actionStatement, sparkSession);
 
-    List<List<Object>> queryResult = JdbcUtils.executeQuery(connectionString, "select * from result1");
-    Assert.assertEquals(2, queryResult.size());
-    Assert.assertEquals(4, queryResult.get(0).size());
-    Assert.assertEquals(new Integer(1), queryResult.get(0).get(0));
-    Assert.assertEquals("v1", queryResult.get(0).get(1));
-    Assert.assertEquals(new Integer(2), queryResult.get(1).get(0));
-    Assert.assertEquals("v2", queryResult.get(1).get(1));
-  }
+        List<List<Object>> queryResult = JdbcUtils.executeQuery(connectionString, "select * from result1");
+        Assert.assertEquals(2, queryResult.size());
+        Assert.assertEquals(4, queryResult.get(0).size());
+        Assert.assertEquals(new Integer(1), queryResult.get(0).get(0));
+        Assert.assertEquals("v1", queryResult.get(0).get(1));
+        Assert.assertEquals(new Integer(2), queryResult.get(1).get(0));
+        Assert.assertEquals("v2", queryResult.get(1).get(1));
+    }
 
-  @Test
-  public void test_writeCsvFile() throws IOException {
+    @Test
+    public void test_writeCsvFile() throws IOException {
 
-    StructField[] structFields = new StructField[] {
-            new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
-            new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
-            new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
-            new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
-    };
+        StructField[] structFields = new StructField[]{
+                new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
+                new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
+        };
 
-    StructType structType = new StructType(structFields);
+        StructType structType = new StructType(structFields);
 
-    List<Row> rows = new ArrayList<>();
-    rows.add(RowFactory.create(1, "v1", 11L, "text1"));
-    rows.add(RowFactory.create(2, "v2", 22L, "text2"));
+        List<Row> rows = new ArrayList<>();
+        rows.add(RowFactory.create(1, "v1", 11L, "text1"));
+        rows.add(RowFactory.create(2, "v2", 22L, "text2"));
 
-    Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
-    df.registerTempTable("df1");
+        Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
+        df.registerTempTable("df1");
 
-    File file = File.createTempFile("test_output_file", ".tmp");
-    String filePath = file.getAbsolutePath();
+        File file = File.createTempFile("test_output_file", ".tmp");
+        String filePath = file.getAbsolutePath();
 
-    file.delete();
+        file.delete();
 
-    boolean fileExists = file.exists();
-    Assert.assertFalse(fileExists);
+        boolean fileExists = file.exists();
+        Assert.assertFalse(fileExists);
 
-    ActionStatement actionStatement = new ActionStatement();
-    actionStatement.setFunctionName("writeCsvFile");
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
+        ActionStatement actionStatement = new ActionStatement();
+        actionStatement.setFunctionName("writeCsvFile");
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-    SparkScriptActionEngine executor = new SparkScriptActionEngine();
-    executor.addActionStatementExecutor(WriteCsvFileActionStatementExecutor.ACTION_NAME, new WriteCsvFileActionStatementExecutor());
-    executor.execute(actionStatement, sparkSession);
+        SparkScriptActionEngine executor = new SparkScriptActionEngine();
+        executor.addActionStatementExecutor(WriteCsvFileActionStatementExecutor.ACTION_NAME, new WriteCsvFileActionStatementExecutor());
+        executor.execute(actionStatement, sparkSession);
 
-    fileExists = file.exists();
-    Assert.assertTrue(fileExists);
+        fileExists = file.exists();
+        Assert.assertTrue(fileExists);
 
-    file.delete();
-  }
+        file.delete();
+    }
 
-  @Test
-  public void test_writeJsonFile() throws IOException {
+    @Test
+    public void test_writeJsonFile() throws IOException {
 
-    StructField[] structFields = new StructField[] {
-            new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
-            new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
-            new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
-            new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
-    };
+        StructField[] structFields = new StructField[]{
+                new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
+                new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
+        };
 
-    StructType structType = new StructType(structFields);
+        StructType structType = new StructType(structFields);
 
-    List<Row> rows = new ArrayList<>();
-    rows.add(RowFactory.create(1, "v1", 11L, "text1"));
-    rows.add(RowFactory.create(2, "v2", 22L, "text2"));
+        List<Row> rows = new ArrayList<>();
+        rows.add(RowFactory.create(1, "v1", 11L, "text1"));
+        rows.add(RowFactory.create(2, "v2", 22L, "text2"));
 
-    Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
-    df.registerTempTable("df1");
+        Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
+        df.registerTempTable("df1");
 
-    File file = File.createTempFile("test_output_file", ".tmp");
-    String filePath = file.getAbsolutePath();
+        File file = File.createTempFile("test_output_file", ".tmp");
+        String filePath = file.getAbsolutePath();
 
-    file.delete();
+        file.delete();
 
-    boolean fileExists = file.exists();
-    Assert.assertFalse(fileExists);
+        boolean fileExists = file.exists();
+        Assert.assertFalse(fileExists);
 
-    ActionStatement actionStatement = new ActionStatement();
-    actionStatement.setFunctionName("writeJsonFile");
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
+        ActionStatement actionStatement = new ActionStatement();
+        actionStatement.setFunctionName("writeJsonFile");
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-    SparkScriptActionEngine executor = new SparkScriptActionEngine();
-    executor.addActionStatementExecutor(WriteJsonFileActionStatementExecutor.ACTION_NAME, new WriteJsonFileActionStatementExecutor());
-    executor.execute(actionStatement, sparkSession);
+        SparkScriptActionEngine executor = new SparkScriptActionEngine();
+        executor.addActionStatementExecutor(WriteJsonFileActionStatementExecutor.ACTION_NAME, new WriteJsonFileActionStatementExecutor());
+        executor.execute(actionStatement, sparkSession);
 
-    fileExists = file.exists();
-    Assert.assertTrue(fileExists);
+        fileExists = file.exists();
+        Assert.assertTrue(fileExists);
 
-    file.delete();
-  }
+        file.delete();
+    }
 
-  @Test
-  public void test_writeParquetFile() throws IOException {
+    @Test
+    public void test_writeParquetFile() throws IOException {
 
-    StructField[] structFields = new StructField[] {
-            new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
-            new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
-            new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
-            new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
-    };
+        StructField[] structFields = new StructField[]{
+                new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("longColumn", DataTypes.LongType, true, Metadata.empty()),
+                new StructField("textColumn", DataTypes.StringType, true, Metadata.empty())
+        };
 
-    StructType structType = new StructType(structFields);
+        StructType structType = new StructType(structFields);
 
-    List<Row> rows = new ArrayList<>();
-    rows.add(RowFactory.create(1, "v1", 11L, "text1"));
-    rows.add(RowFactory.create(2, "v2", 22L, "text2"));
+        List<Row> rows = new ArrayList<>();
+        rows.add(RowFactory.create(1, "v1", 11L, "text1"));
+        rows.add(RowFactory.create(2, "v2", 22L, "text2"));
 
-    Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
-    df.registerTempTable("df1");
+        Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
+        df.registerTempTable("df1");
 
-    File file = File.createTempFile("test_output_file", ".tmp");
-    String filePath = file.getAbsolutePath();
+        File file = File.createTempFile("test_output_file", ".tmp");
+        String filePath = file.getAbsolutePath();
 
-    file.delete();
+        file.delete();
 
-    boolean fileExists = file.exists();
-    Assert.assertFalse(fileExists);
+        boolean fileExists = file.exists();
+        Assert.assertFalse(fileExists);
 
-    ActionStatement actionStatement = new ActionStatement();
-    actionStatement.setFunctionName("writeParquetFile");
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
-    actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
+        ActionStatement actionStatement = new ActionStatement();
+        actionStatement.setFunctionName("writeParquetFile");
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, filePath));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
+        actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-    SparkScriptActionEngine executor = new SparkScriptActionEngine();
-    executor.addActionStatementExecutor(WriteParquetFileActionStatementExecutor.ACTION_NAME, new WriteParquetFileActionStatementExecutor());
-    executor.execute(actionStatement, sparkSession);
+        SparkScriptActionEngine executor = new SparkScriptActionEngine();
+        executor.addActionStatementExecutor(WriteParquetFileActionStatementExecutor.ACTION_NAME, new WriteParquetFileActionStatementExecutor());
+        executor.execute(actionStatement, sparkSession);
 
-    fileExists = file.exists();
-    Assert.assertTrue(fileExists);
+        fileExists = file.exists();
+        Assert.assertTrue(fileExists);
 
-    file.delete();
-  }
+        file.delete();
+    }
 
   /* Note: replace MailRun url and api key in following code with your own values to run this test.
   @Test

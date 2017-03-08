@@ -20,7 +20,7 @@ import java.io.File
 import java.util.Properties
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.types.{StructType, Metadata, DataTypes, StructField}
+import org.apache.spark.sql.types.{DataTypes, Metadata, StructField, StructType}
 import org.scalatest.{FunSpec, Matchers}
 
 class DataFrameJdbcWriterTestSpec extends FunSpec with Matchers {

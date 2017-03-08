@@ -17,7 +17,7 @@
 package com.uber.sparkscript.util;
 
 public class DummyCredentialProvider implements CredentialProvider {
-  public String getPassword(String passwordFile, String passwordEntry) {
-    return "";
-  }
+    public String getPassword(String passwordFile, String passwordEntry) {
+        return "";
+    }
 }

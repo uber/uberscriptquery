@@ -20,23 +20,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CounterMap implements java.io.Serializable {
-  private Map<String, Long> map = new HashMap<>();
+    private Map<String, Long> map = new HashMap<>();
 
-  public synchronized void increase(String name) {
-    Long oldValue = map.get(name);
-    if (oldValue == null) {
-      map.put(name, 1L);
-    } else {
-      map.put(name, oldValue + 1);
+    public synchronized void increase(String name) {
+        Long oldValue = map.get(name);
+        if (oldValue == null) {
+            map.put(name, 1L);
+        } else {
+            map.put(name, oldValue + 1);
+        }
     }
-  }
 
-  public synchronized long getCount(String name) {
-    Long oldValue = map.get(name);
-    if (oldValue == null) {
-      return 0L;
-    } else {
-      return oldValue;
+    public synchronized long getCount(String name) {
+        Long oldValue = map.get(name);
+        if (oldValue == null) {
+            return 0L;
+        } else {
+            return oldValue;
+        }
     }
-  }
 }

@@ -28,34 +28,35 @@ import org.apache.spark.sql.execution.datasources.jdbc.{JdbcUtils, JdbcWriterUti
 import scala.collection.JavaConverters._
 
 /**
- * Class used to write a [[Dataset]] to JDBC. This file is to mimic Spark DataFrameWriter, and provide
- * enhanced capabilities, for example, supporting primary keys and doing upsert based on the primary keys
- * to make JDBC write idempotent.
- *
- */
-final class DataFrameJdbcWriter[T] (ds: Dataset[T]) {
+  * Class used to write a [[Dataset]] to JDBC. This file is to mimic Spark DataFrameWriter, and provide
+  * enhanced capabilities, for example, supporting primary keys and doing upsert based on the primary keys
+  * to make JDBC write idempotent.
+  *
+  */
+final class DataFrameJdbcWriter[T](ds: Dataset[T]) {
 
   private val df = ds.toDF()
+  private var mode: SaveMode = SaveMode.ErrorIfExists
 
   /**
-   * Specifies the behavior when data or table already exists. Options include:
-   *   - `SaveMode.Overwrite`: overwrite the existing data.
-   *   - `SaveMode.Append`: append the data.
-   *   - `SaveMode.Ignore`: ignore the operation (i.e. no-op).
-   *   - `SaveMode.ErrorIfExists`: default option, throw an exception at runtime.
-   */
+    * Specifies the behavior when data or table already exists. Options include:
+    *   - `SaveMode.Overwrite`: overwrite the existing data.
+    *   - `SaveMode.Append`: append the data.
+    *   - `SaveMode.Ignore`: ignore the operation (i.e. no-op).
+    *   - `SaveMode.ErrorIfExists`: default option, throw an exception at runtime.
+    */
   def mode(saveMode: SaveMode): DataFrameJdbcWriter[T] = {
     this.mode = saveMode
     this
   }
 
   /**
-   * Specifies the behavior when data or table already exists. Options include:
-   *   - `overwrite`: overwrite the existing data.
-   *   - `append`: append the data.
-   *   - `ignore`: ignore the operation (i.e. no-op).
-   *   - `error`: default option, throw an exception at runtime.
-   */
+    * Specifies the behavior when data or table already exists. Options include:
+    *   - `overwrite`: overwrite the existing data.
+    *   - `append`: append the data.
+    *   - `ignore`: ignore the operation (i.e. no-op).
+    *   - `error`: default option, throw an exception at runtime.
+    */
   def mode(saveMode: String): DataFrameJdbcWriter[T] = {
     this.mode = saveMode.toLowerCase match {
       case "overwrite" => SaveMode.Overwrite
@@ -71,6 +72,10 @@ final class DataFrameJdbcWriter[T] (ds: Dataset[T]) {
   def jdbc(url: String, table: String, primaryKeys: java.util.List[String], indexColumns: java.util.List[String], textColumns: java.util.List[String], postWriteSql: String, writesPerSecond: Double, connectionProperties: Properties): Unit = {
     jdbc(url, table, primaryKeys.asScala.toSeq, indexColumns.asScala.toSeq, textColumns.asScala.toSeq, postWriteSql, writesPerSecond, connectionProperties)
   }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  // Builder pattern config options
+  ///////////////////////////////////////////////////////////////////////////////////////
 
   def jdbc(url: String, table: String, primaryKeys: Seq[String], indexColumns: Seq[String], textColumns: Seq[String], postWriteSql: String, writesPerSecond: Double, connectionProperties: Properties): Unit = {
     val props = new Properties()
@@ -116,15 +121,13 @@ final class DataFrameJdbcWriter[T] (ds: Dataset[T]) {
       conn.close()
     }
 
-    val retry = if (primaryKeys.isEmpty) {false} else {true}
+    val retry = if (primaryKeys.isEmpty) {
+      false
+    } else {
+      true
+    }
     System.out.println(String.format("Save to table %s with retry %s", table, String.valueOf(retry)))
     JdbcWriterUtils.saveTable(df, url, table, textColumns, postWriteSql, retry, writesPerSecond, props)
   }
-
-  ///////////////////////////////////////////////////////////////////////////////////////
-  // Builder pattern config options
-  ///////////////////////////////////////////////////////////////////////////////////////
-
-  private var mode: SaveMode = SaveMode.ErrorIfExists
 
 }

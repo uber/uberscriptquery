@@ -31,104 +31,101 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 public class HttpUtils {
-  private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
+    public static final int OK_CODE = 200;
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
-  public static final int OK_CODE = 200;
+    public static HttpResponse get(String url, Map<String, String> header) {
+        int statusCode = 0;
+        String responseBody = "";
 
-  public static HttpResponse get(String url, Map<String, String> header) {
-    int statusCode = 0;
-    String responseBody = "";
-
-    try {
-      logger.info(String.format("Getting url: %s", url));
-      try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-        HttpGet httpGet = new HttpGet(url);
-        if (header != null && !header.isEmpty()) {
-          for (Map.Entry<String, String> entry : header.entrySet()) {
-            httpGet.addHeader(entry.getKey(), entry.getValue());
-          }
+        try {
+            logger.info(String.format("Getting url: %s", url));
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpGet httpGet = new HttpGet(url);
+                if (header != null && !header.isEmpty()) {
+                    for (Map.Entry<String, String> entry : header.entrySet()) {
+                        httpGet.addHeader(entry.getKey(), entry.getValue());
+                    }
+                }
+                try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                    statusCode = httpResponse.getStatusLine().getStatusCode();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))) {
+                        responseBody = IOUtils.toString(reader);
+                        logger.info(String.format("Finished getting url: %s, Http status: %s, Response body: %s",
+                                url, statusCode, truncateLogString(responseBody)));
+                    }
+                }
+            }
+            return new HttpResponse(statusCode, responseBody);
+        } catch (Exception ex) {
+            String msg = String.format("Failed getting url: %s", url);
+            logger.warn(msg, ex);
+            throw new RuntimeException(msg, ex);
         }
-        try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-          statusCode = httpResponse.getStatusLine().getStatusCode();
-          try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))) {
-            responseBody = IOUtils.toString(reader);
-            logger.info(String.format("Finished getting url: %s, Http status: %s, Response body: %s",
-                    url, statusCode, truncateLogString(responseBody)));
-          }
+    }
+
+    public static HttpResponse post(String url, Map<String, String> header, String body) {
+        int statusCode = 0;
+        String responseBody = "";
+
+        try {
+            logger.info(String.format("Getting url: %s", url));
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpPost httpPost = new HttpPost(url);
+                if (header != null && !header.isEmpty()) {
+                    for (Map.Entry<String, String> entry : header.entrySet()) {
+                        httpPost.addHeader(entry.getKey(), entry.getValue());
+                    }
+                }
+                httpPost.setEntity(new StringEntity(body));
+                try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
+                    statusCode = httpResponse.getStatusLine().getStatusCode();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))) {
+                        responseBody = IOUtils.toString(reader);
+                        logger.info(String.format("Finished getting url: %s, Http status: %s, Response body: %s",
+                                url, statusCode, truncateLogString(responseBody)));
+                    }
+                }
+            }
+            return new HttpResponse(statusCode, responseBody);
+        } catch (Exception ex) {
+            String msg = String.format("Failed getting url: %s", url);
+            logger.warn(msg, ex);
+            throw new RuntimeException(msg, ex);
         }
-      }
-      return new HttpResponse(statusCode, responseBody);
     }
-    catch (Exception ex) {
-      String msg = String.format("Failed getting url: %s", url);
-      logger.warn(msg, ex);
-      throw new RuntimeException(msg, ex);
-    }
-  }
 
-  public static HttpResponse post(String url, Map<String, String> header, String body) {
-    int statusCode = 0;
-    String responseBody = "";
-
-    try {
-      logger.info(String.format("Getting url: %s", url));
-      try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-        HttpPost httpPost = new HttpPost(url);
-        if (header != null && !header.isEmpty()) {
-          for (Map.Entry<String, String> entry : header.entrySet()) {
-            httpPost.addHeader(entry.getKey(), entry.getValue());
-          }
+    private static String truncateLogString(String str) {
+        int maxSize = 1000;
+        if (str == null || str.length() <= maxSize) {
+            return str;
         }
-        httpPost.setEntity(new StringEntity(body));
-        try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-          statusCode = httpResponse.getStatusLine().getStatusCode();
-          try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))) {
-            responseBody = IOUtils.toString(reader);
-            logger.info(String.format("Finished getting url: %s, Http status: %s, Response body: %s",
-                    url, statusCode, truncateLogString(responseBody)));
-          }
+
+        return str.substring(0, maxSize) + "...";
+    }
+
+    public static class HttpResponse {
+
+        private int code;
+        private String body;
+
+        public HttpResponse(int code, String body) {
+            super();
+            this.code = code;
+            this.body = body;
         }
-      }
-      return new HttpResponse(statusCode, responseBody);
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getBody() {
+            return body;
+        }
+
+        @Override
+        public String toString() {
+            return "HttpResponse [code=" + code + ", body=" + body + "]";
+        }
     }
-    catch (Exception ex) {
-      String msg = String.format("Failed getting url: %s", url);
-      logger.warn(msg, ex);
-      throw new RuntimeException(msg, ex);
-    }
-  }
-
-  private static String truncateLogString(String str) {
-    int maxSize = 1000;
-    if (str == null || str.length() <= maxSize) {
-      return str;
-    }
-
-    return str.substring(0, maxSize) + "...";
-  }
-
-  public static class HttpResponse {
-
-    private int code;
-    private String body;
-
-    public HttpResponse(int code, String body) {
-      super();
-      this.code = code;
-      this.body = body;
-    }
-
-    public int getCode() {
-      return code;
-    }
-
-    public String getBody() {
-      return body;
-    }
-
-    @Override
-    public String toString() {
-      return "HttpResponse [code=" + code + ", body=" + body + "]";
-    }
-  }
 }

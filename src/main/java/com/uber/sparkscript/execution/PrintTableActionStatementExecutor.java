@@ -21,24 +21,22 @@ import com.uber.sparkscript.jdbc.DataSetResult;
 import com.uber.sparkscript.util.CredentialProvider;
 import com.uber.sparkscript.util.SparkUtils;
 import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PrintTableActionStatementExecutor implements ActionStatementExecutor {
 
-  public static final String ACTION_NAME = "printTable";
+    public static final String ACTION_NAME = "printTable";
 
-  @Override
-  public Object execute(SparkSession sparkSession, ActionStatement actionStatement, CredentialProvider credentialManager) {
-    String tableName = actionStatement.getParamValues().get(0).getValue().toString();
+    @Override
+    public Object execute(SparkSession sparkSession, ActionStatement actionStatement, CredentialProvider credentialManager) {
+        String tableName = actionStatement.getParamValues().get(0).getValue().toString();
 
-    DataSetResult dataSetResult = SparkUtils.getTableData(sparkSession, tableName);
-    System.out.println("------------------------------");
-    System.out.println("Table: " + tableName);
-    dataSetResult.print();
-    System.out.println("------------------------------");
+        DataSetResult dataSetResult = SparkUtils.getTableData(sparkSession, tableName);
+        System.out.println("------------------------------");
+        System.out.println("Table: " + tableName);
+        dataSetResult.print();
+        System.out.println("------------------------------");
 
-    return null;
-  }
+        return null;
+    }
 
 }

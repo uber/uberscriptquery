@@ -19,5 +19,5 @@ package com.uber.sparkscript.util;
 import java.util.concurrent.Callable;
 
 public interface RetryPolicy<T> {
-  T attempt(Callable<T> callable);
+    T attempt(Callable<T> callable);
 }

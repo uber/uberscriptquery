@@ -20,75 +20,75 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StatementAssignment implements java.io.Serializable {
-  public static final String QUERY_CONFIG_CONNECTION_STRING = "connectionString";
-  public static final String QUERY_CONFIG_PASSWORD_FILE = "passwordFile";
-  public static final String QUERY_CONFIG_PASSWORD_ENTRY = "passwordEntry";
+    public static final String QUERY_CONFIG_CONNECTION_STRING = "connectionString";
+    public static final String QUERY_CONFIG_PASSWORD_FILE = "passwordFile";
+    public static final String QUERY_CONFIG_PASSWORD_ENTRY = "passwordEntry";
 
-  private String tableAlias;
-  private String queryType;
-  private String queryEngine;
-  private String queryText;
+    private String tableAlias;
+    private String queryType;
+    private String queryEngine;
+    private String queryText;
 
-  private Map<String, String> queryConfig = new HashMap<>();
-  private String queryStatement;
+    private Map<String, String> queryConfig = new HashMap<>();
+    private String queryStatement;
 
-  public String getTableAlias() {
-    return tableAlias;
-  }
+    public String getTableAlias() {
+        return tableAlias;
+    }
 
-  public void setTableAlias(String tableAlias) {
-    this.tableAlias = tableAlias;
-  }
+    public void setTableAlias(String tableAlias) {
+        this.tableAlias = tableAlias;
+    }
 
-  public String getQueryType() {
-    return queryType;
-  }
+    public String getQueryType() {
+        return queryType;
+    }
 
-  public void setQueryType(String queryType) {
-    this.queryType = queryType;
-  }
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
+    }
 
-  public String getQueryEngine() {
-    return queryEngine;
-  }
+    public String getQueryEngine() {
+        return queryEngine;
+    }
 
-  public void setQueryEngine(String queryEngine) {
-    this.queryEngine = queryEngine;
-  }
+    public void setQueryEngine(String queryEngine) {
+        this.queryEngine = queryEngine;
+    }
 
-  public String getQueryText() {
-    return queryText;
-  }
+    public String getQueryText() {
+        return queryText;
+    }
 
-  public void setQueryText(String queryText) {
-    this.queryText = queryText;
-  }
+    public void setQueryText(String queryText) {
+        this.queryText = queryText;
+    }
 
-  public Map<String, String> getQueryConfig() {
-    return queryConfig;
-  }
+    public Map<String, String> getQueryConfig() {
+        return queryConfig;
+    }
 
-  public void setQueryConfig(Map<String, String> queryConfig) {
-    this.queryConfig = queryConfig;
-  }
+    public void setQueryConfig(Map<String, String> queryConfig) {
+        this.queryConfig = queryConfig;
+    }
 
-  public String getQueryStatement() {
-    return queryStatement;
-  }
+    public String getQueryStatement() {
+        return queryStatement;
+    }
 
-  public void setQueryStatement(String queryStatement) {
-    this.queryStatement = queryStatement;
-  }
+    public void setQueryStatement(String queryStatement) {
+        this.queryStatement = queryStatement;
+    }
 
-  @Override
-  public String toString() {
-    return "StatementAssignment{" +
-            "tableAlias='" + tableAlias + '\'' +
-            ", queryType='" + queryType + '\'' +
-            ", queryEngine='" + queryEngine + '\'' +
-            ", queryText='" + queryText + '\'' +
-            ", queryConfig=" + queryConfig +
-            ", queryStatement='" + queryStatement + '\'' +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "StatementAssignment{" +
+                "tableAlias='" + tableAlias + '\'' +
+                ", queryType='" + queryType + '\'' +
+                ", queryEngine='" + queryEngine + '\'' +
+                ", queryText='" + queryText + '\'' +
+                ", queryConfig=" + queryConfig +
+                ", queryStatement='" + queryStatement + '\'' +
+                '}';
+    }
 }

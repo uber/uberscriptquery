@@ -17,40 +17,40 @@
 package com.uber.sparkscript.antlr4.parsing;
 
 public class FileAssignment implements java.io.Serializable {
-  private String tableAlias;
-  private String fileType;
-  private String fileLocation;
+    private String tableAlias;
+    private String fileType;
+    private String fileLocation;
 
-  public String getTableAlias() {
-    return tableAlias;
-  }
+    public String getTableAlias() {
+        return tableAlias;
+    }
 
-  public void setTableAlias(String tableAlias) {
-    this.tableAlias = tableAlias;
-  }
+    public void setTableAlias(String tableAlias) {
+        this.tableAlias = tableAlias;
+    }
 
-  public String getFileType() {
-    return fileType;
-  }
+    public String getFileType() {
+        return fileType;
+    }
 
-  public void setFileType(String fileType) {
-    this.fileType = fileType;
-  }
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
 
-  public String getFileLocation() {
-    return fileLocation;
-  }
+    public String getFileLocation() {
+        return fileLocation;
+    }
 
-  public void setFileLocation(String fileLocation) {
-    this.fileLocation = fileLocation;
-  }
+    public void setFileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
+    }
 
-  @Override
-  public String toString() {
-    return "FileAssignment{" +
-            "tableAlias='" + tableAlias + '\'' +
-            ", fileType='" + fileType + '\'' +
-            ", fileLocation='" + fileLocation + '\'' +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "FileAssignment{" +
+                "tableAlias='" + tableAlias + '\'' +
+                ", fileType='" + fileType + '\'' +
+                ", fileLocation='" + fileLocation + '\'' +
+                '}';
+    }
 }

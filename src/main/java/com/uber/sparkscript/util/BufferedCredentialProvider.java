@@ -25,27 +25,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BufferedCredentialProvider implements java.io.Serializable, CredentialProvider {
-  private static final Logger logger = LoggerFactory.getLogger(BufferedCredentialProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(BufferedCredentialProvider.class);
 
-  private List<CredentialEntry> credentialEntries = new ArrayList<>();
+    private List<CredentialEntry> credentialEntries = new ArrayList<>();
 
-  public void addPassword(String passwordFile, String passwordEntry, String passwordValue) {
-    CredentialEntry credentialEntry = new CredentialEntry();
-    credentialEntry.setPasswordFile(passwordFile);
-    credentialEntry.setPasswordEntry(passwordEntry);
-    credentialEntry.setPasswordValue(passwordValue);
+    public void addPassword(String passwordFile, String passwordEntry, String passwordValue) {
+        CredentialEntry credentialEntry = new CredentialEntry();
+        credentialEntry.setPasswordFile(passwordFile);
+        credentialEntry.setPasswordEntry(passwordEntry);
+        credentialEntry.setPasswordValue(passwordValue);
 
-    credentialEntries.add(credentialEntry);
-  }
-
-  @Override
-  public String getPassword(String passwordFile, String passwordEntry) {
-    for (CredentialEntry entry : credentialEntries) {
-      if (StringUtils.equals(entry.getPasswordFile(), passwordFile)
-              && StringUtils.equals(entry.getPasswordEntry(), passwordEntry)) {
-        return entry.getPasswordValue();
-      }
+        credentialEntries.add(credentialEntry);
     }
-    return null;
-  }
+
+    @Override
+    public String getPassword(String passwordFile, String passwordEntry) {
+        for (CredentialEntry entry : credentialEntries) {
+            if (StringUtils.equals(entry.getPasswordFile(), passwordFile)
+                    && StringUtils.equals(entry.getPasswordEntry(), passwordEntry)) {
+                return entry.getPasswordValue();
+            }
+        }
+        return null;
+    }
 }

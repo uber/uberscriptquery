@@ -27,28 +27,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SparkScriptActionEngine {
-  private static final Logger logger = LoggerFactory.getLogger(SparkScriptActionEngine.class);
+    private static final Logger logger = LoggerFactory.getLogger(SparkScriptActionEngine.class);
 
-  private CredentialProvider credentialManager = new DummyCredentialProvider();
+    private CredentialProvider credentialManager = new DummyCredentialProvider();
 
-  private Map<String, ActionStatementExecutor> actionStatementExecutors = new HashMap<>();
+    private Map<String, ActionStatementExecutor> actionStatementExecutors = new HashMap<>();
 
-  public void setCredentialProvider(CredentialProvider credentialManager) {
-    this.credentialManager = credentialManager;
-  }
-
-  public void addActionStatementExecutor(String name, ActionStatementExecutor executor) {
-    actionStatementExecutors.put(name, executor);
-    logger.info(String.format("Added action executor %s for %s", executor.getClass().getName(), name));
-  }
-
-  public Object execute(ActionStatement actionStatement, SparkSession sparkSession) {
-    ActionStatementExecutor actionStatementExecutor = actionStatementExecutors.get(actionStatement.getFunctionName());
-    if (actionStatementExecutor != null) {
-      return actionStatementExecutor.execute(sparkSession, actionStatement, this.credentialManager);
-    } else {
-      throw new RuntimeException(String.format("Unsupported action %s", actionStatement));
+    public void setCredentialProvider(CredentialProvider credentialManager) {
+        this.credentialManager = credentialManager;
     }
-  }
+
+    public void addActionStatementExecutor(String name, ActionStatementExecutor executor) {
+        actionStatementExecutors.put(name, executor);
+        logger.info(String.format("Added action executor %s for %s", executor.getClass().getName(), name));
+    }
+
+    public Object execute(ActionStatement actionStatement, SparkSession sparkSession) {
+        ActionStatementExecutor actionStatementExecutor = actionStatementExecutors.get(actionStatement.getFunctionName());
+        if (actionStatementExecutor != null) {
+            return actionStatementExecutor.execute(sparkSession, actionStatement, this.credentialManager);
+        } else {
+            throw new RuntimeException(String.format("Unsupported action %s", actionStatement));
+        }
+    }
 
 }

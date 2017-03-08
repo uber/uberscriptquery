@@ -33,47 +33,47 @@ import java.util.List;
 import java.util.Map;
 
 public class TemplateUtils {
-  public static String transform(String text, Map<String, Object> map) {
-    List<String> supportedVariables = new ArrayList<>();
-    for (String entry : map.keySet()) {
-      supportedVariables.add(String.format("${%s}", entry));
+    public static String transform(String text, Map<String, Object> map) {
+        List<String> supportedVariables = new ArrayList<>();
+        for (String entry : map.keySet()) {
+            supportedVariables.add(String.format("${%s}", entry));
+        }
+
+        String supportedVariablesStr = StringUtils.join(supportedVariables, ", ");
+
+        final String templateName = "query";
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_24);
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+        StringTemplateLoader ctl = new StringTemplateLoader();
+        ctl.putTemplate(templateName, text);
+        cfg.setTemplateLoader(ctl);
+
+        Template template;
+        try {
+            template = cfg.getTemplate(templateName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get template: " + templateName, e);
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
+
+        try {
+            template.process(map, writer);
+        } catch (TemplateException | IOException e) {
+            throw new RuntimeException(String.format("Failed to process text template: %s. Supported variables: %s", text, supportedVariablesStr), e);
+        }
+
+        try {
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Failed to flush writer for text template: %s. Supported variables: %s", text, supportedVariablesStr), e);
+        }
+
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        String result = new String(bytes, StandardCharsets.UTF_8);
+        return result;
     }
-
-    String supportedVariablesStr = StringUtils.join(supportedVariables, ", ");
-
-    final String templateName = "query";
-    Configuration cfg = new Configuration(Configuration.VERSION_2_3_24);
-    cfg.setDefaultEncoding("UTF-8");
-    cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
-    StringTemplateLoader ctl = new StringTemplateLoader();
-    ctl.putTemplate(templateName, text);
-    cfg.setTemplateLoader(ctl);
-
-    Template template;
-    try {
-      template = cfg.getTemplate(templateName);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to get template: " + templateName, e);
-    }
-
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
-
-    try {
-      template.process(map, writer);
-    } catch (TemplateException | IOException e) {
-      throw new RuntimeException(String.format("Failed to process text template: %s. Supported variables: %s", text, supportedVariablesStr), e);
-    }
-
-    try {
-      writer.flush();
-    } catch (IOException e) {
-      throw new RuntimeException(String.format("Failed to flush writer for text template: %s. Supported variables: %s", text, supportedVariablesStr), e);
-    }
-
-    byte[] bytes = byteArrayOutputStream.toByteArray();
-    String result = new String(bytes, StandardCharsets.UTF_8);
-    return result;
-  }
 }

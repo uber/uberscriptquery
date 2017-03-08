@@ -20,18 +20,18 @@ import java.net.InetAddress;
 import java.util.Map;
 
 public class NetworkUtils {
-  public static String getLocalHostName() {
-    try {
-      Map<String, String> env = System.getenv();
-      if (env.containsKey("COMPUTERNAME"))
-        return env.get("COMPUTERNAME");
-      else if (env.containsKey("HOSTNAME"))
-        return env.get("HOSTNAME");
-      else
-        return InetAddress.getLocalHost().getHostName();
-    } catch (Throwable e) {
-      return "unknown_localhost_name";
+    public static String getLocalHostName() {
+        try {
+            Map<String, String> env = System.getenv();
+            if (env.containsKey("COMPUTERNAME"))
+                return env.get("COMPUTERNAME");
+            else if (env.containsKey("HOSTNAME"))
+                return env.get("HOSTNAME");
+            else
+                return InetAddress.getLocalHost().getHostName();
+        } catch (Throwable e) {
+            return "unknown_localhost_name";
+        }
     }
-  }
 
 }

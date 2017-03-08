@@ -22,40 +22,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataSetResult {
-  private List<String> columnNames = new ArrayList<>();
-  private List<List<Object>> rows = new ArrayList<>();
+    private List<String> columnNames = new ArrayList<>();
+    private List<List<Object>> rows = new ArrayList<>();
 
-  public List<String> getColumnNames() {
-    return columnNames;
-  }
-
-  public void setColumnNames(List<String> columnNames) {
-    this.columnNames = columnNames;
-  }
-
-  public List<List<Object>> getRows() {
-    return rows;
-  }
-
-  public void setRows(List<List<Object>> rows) {
-    this.rows = rows;
-  }
-
-  public String getSingleStringValue() {
-    if (rows == null || rows.isEmpty()) {
-      return "";
+    public List<String> getColumnNames() {
+        return columnNames;
     }
-    List<Object> values = rows.get(0);
-    if (values == null || values.isEmpty()) {
-      return "";
-    }
-    return String.valueOf(values.get(0));
-  }
 
-  public void print() {
-    System.out.println(StringUtils.join(columnNames, ", "));
-    for (List<Object> row : rows) {
-      System.out.println(StringUtils.join(row, ", "));
+    public void setColumnNames(List<String> columnNames) {
+        this.columnNames = columnNames;
     }
-  }
+
+    public List<List<Object>> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<List<Object>> rows) {
+        this.rows = rows;
+    }
+
+    public String getSingleStringValue() {
+        if (rows == null || rows.isEmpty()) {
+            return "";
+        }
+        List<Object> values = rows.get(0);
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        return String.valueOf(values.get(0));
+    }
+
+    public void print() {
+        System.out.println(StringUtils.join(columnNames, ", "));
+        for (List<Object> row : rows) {
+            System.out.println(StringUtils.join(row, ", "));
+        }
+    }
 }

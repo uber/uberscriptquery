@@ -22,26 +22,26 @@ import java.util.TimeZone;
 
 public class DateTimeUtils {
 
-	public static long getMillisSmart(double value) {
-		Date dt = new Date((long)value);
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		cal.setTime(dt);
-		int year = cal.get(Calendar.YEAR);
-		if (year >= 2000 && year < 3000) {
-			return (long)value;
-		}
-		return (long)(value * 1000);
-	}
+    public static long getMillisSmart(double value) {
+        Date dt = new Date((long) value);
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.setTime(dt);
+        int year = cal.get(Calendar.YEAR);
+        if (year >= 2000 && year < 3000) {
+            return (long) value;
+        }
+        return (long) (value * 1000);
+    }
 
-	public static long getMillisSmart(long value) {
-		Date dt = new Date(value);
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		cal.setTime(dt);
-		int year = cal.get(Calendar.YEAR);
-		if (year >= 2000 && year < 3000) {
-			return value;
-		}
-		return value * 1000;
-	}
+    public static long getMillisSmart(long value) {
+        Date dt = new Date(value);
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.setTime(dt);
+        int year = cal.get(Calendar.YEAR);
+        if (year >= 2000 && year < 3000) {
+            return value;
+        }
+        return value * 1000;
+    }
 
 }

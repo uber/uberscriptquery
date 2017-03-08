@@ -21,31 +21,31 @@ import java.util.Map;
 
 public class SparkScriptTemplateParseResult implements java.io.Serializable {
 
-  private Map<String, Object> variableMap = new HashMap<>();
+    private Map<String, Object> variableMap = new HashMap<>();
 
-  private String templateBody;
+    private String templateBody;
 
-  public Map<String, Object> getVariableMap() {
-    return variableMap;
-  }
+    public Map<String, Object> getVariableMap() {
+        return variableMap;
+    }
 
-  public void setVariableMap(Map<String, Object> variableMap) {
-    this.variableMap = variableMap;
-  }
+    public void setVariableMap(Map<String, Object> variableMap) {
+        this.variableMap = variableMap;
+    }
 
-  public String getTemplateBody() {
-    return templateBody;
-  }
+    public String getTemplateBody() {
+        return templateBody;
+    }
 
-  public void setTemplateBody(String templateBody) {
-    this.templateBody = templateBody;
-  }
+    public void setTemplateBody(String templateBody) {
+        this.templateBody = templateBody;
+    }
 
-  @Override
-  public String toString() {
-    return "SparkScriptTemplateParseResult{" +
-            "variableMap=" + variableMap +
-            ", templateBody='" + templateBody + '\'' +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "SparkScriptTemplateParseResult{" +
+                "variableMap=" + variableMap +
+                ", templateBody='" + templateBody + '\'' +
+                '}';
+    }
 }

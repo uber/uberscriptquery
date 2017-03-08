@@ -35,51 +35,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SparkUtilsTest {
-  private String master = "local[1]";
-  private String appName = "spark_unit_test";
+    private String master = "local[1]";
+    private String appName = "spark_unit_test";
 
-  private SparkConf sparkConf;
-  private SparkSession sparkSession;
+    private SparkConf sparkConf;
+    private SparkSession sparkSession;
 
-  @Before
-  public void before() {
-    sparkConf = new SparkConf()
-            .setMaster(master)
-            .setAppName(appName)
-            .set("spark.driver.allowMultipleContexts", "true");
+    @Before
+    public void before() {
+        sparkConf = new SparkConf()
+                .setMaster(master)
+                .setAppName(appName)
+                .set("spark.driver.allowMultipleContexts", "true");
 
-    sparkSession = SparkSession
-            .builder()
-            .config(sparkConf).getOrCreate();
-  }
+        sparkSession = SparkSession
+                .builder()
+                .config(sparkConf).getOrCreate();
+    }
 
-  @After
-  public void after() {
-    sparkSession.stop();
-  }
+    @After
+    public void after() {
+        sparkSession.stop();
+    }
 
-  @Test
-  public void test_getDataSetResult() {
+    @Test
+    public void test_getDataSetResult() {
 
-    StructField[] structFields = new StructField[] {
-            new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
-            new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty())
-    };
+        StructField[] structFields = new StructField[]{
+                new StructField("intColumn", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("stringColumn", DataTypes.StringType, true, Metadata.empty())
+        };
 
-    StructType structType = new StructType(structFields);
+        StructType structType = new StructType(structFields);
 
-    List<Row> rows = new ArrayList<>();
-    rows.add(RowFactory.create(1, "v1"));
-    rows.add(RowFactory.create(2, "v2"));
+        List<Row> rows = new ArrayList<>();
+        rows.add(RowFactory.create(1, "v1"));
+        rows.add(RowFactory.create(2, "v2"));
 
-    Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
+        Dataset<Row> df = sparkSession.createDataFrame(rows, structType);
 
-    DataSetResult dataSetResult = SparkUtils.getDataSetResult(df);
-    Assert.assertEquals(2, dataSetResult.getColumnNames().size());
-    Assert.assertEquals(2, dataSetResult.getRows().size());
-    Assert.assertEquals(new Integer(1), dataSetResult.getRows().get(0).get(0));
-    Assert.assertEquals("v1", dataSetResult.getRows().get(0).get(1));
-    Assert.assertEquals(new Integer(2), dataSetResult.getRows().get(1).get(0));
-    Assert.assertEquals("v2", dataSetResult.getRows().get(1).get(1));
-  }
+        DataSetResult dataSetResult = SparkUtils.getDataSetResult(df);
+        Assert.assertEquals(2, dataSetResult.getColumnNames().size());
+        Assert.assertEquals(2, dataSetResult.getRows().size());
+        Assert.assertEquals(new Integer(1), dataSetResult.getRows().get(0).get(0));
+        Assert.assertEquals("v1", dataSetResult.getRows().get(0).get(1));
+        Assert.assertEquals(new Integer(2), dataSetResult.getRows().get(1).get(0));
+        Assert.assertEquals("v2", dataSetResult.getRows().get(1).get(1));
+    }
 }

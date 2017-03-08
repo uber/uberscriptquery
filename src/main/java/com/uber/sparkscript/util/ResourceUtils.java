@@ -24,25 +24,25 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ResourceUtils {
-  public static String readResource(Class clazz, String resourceName) {
-    try (InputStream in = clazz.getResourceAsStream(resourceName)) {
-      return IOUtils.toString(in);
-    } catch (Throwable ex) {
-      throw new RuntimeException(ex);
+    public static String readResource(Class clazz, String resourceName) {
+        try (InputStream in = clazz.getResourceAsStream(resourceName)) {
+            return IOUtils.toString(in);
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
     }
-  }
 
-  public static String readResource(String resourceName) {
-    try (InputStream in = ResourceUtils.class.getClassLoader().getResourceAsStream(resourceName)) {
-      return IOUtils.toString(in);
-    } catch (Throwable ex) {
-      throw new RuntimeException(ex);
+    public static String readResource(String resourceName) {
+        try (InputStream in = ResourceUtils.class.getClassLoader().getResourceAsStream(resourceName)) {
+            return IOUtils.toString(in);
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
     }
-  }
 
-  public static List<String> readLinesFromResource(Class clazz, String resourceName) {
-    String text = readResource(clazz, resourceName);
-    return Arrays.asList(text.split("\n"));
-  }
+    public static List<String> readLinesFromResource(Class clazz, String resourceName) {
+        String text = readResource(clazz, resourceName);
+        return Arrays.asList(text.split("\n"));
+    }
 
 }

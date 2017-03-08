@@ -28,19 +28,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class JdbcSqlInputStatementExecutor implements SqlInputStatementExecutor {
-  private static final Logger logger = LoggerFactory.getLogger(JdbcSqlInputStatementExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(JdbcSqlInputStatementExecutor.class);
 
-  @Override
-  public Dataset<Row> execute(SparkSession sparkSession, StatementAssignment statementAssignment, CredentialProvider credentialManager) {
-    logger.info("Running query by sql jdbc: " + statementAssignment);
-    Map<String, String> queryConfig = statementAssignment.getQueryConfig();
-    String connectionString = queryConfig.get(StatementAssignment.QUERY_CONFIG_CONNECTION_STRING);
-    String passwordFile = queryConfig.get(StatementAssignment.QUERY_CONFIG_PASSWORD_FILE);
-    String passwordEntry = queryConfig.get(StatementAssignment.QUERY_CONFIG_PASSWORD_ENTRY);
-    String password = credentialManager.getPassword(passwordFile, passwordEntry);
-    if (password != null) {
-      connectionString = connectionString.replace("[password]", password);
+    @Override
+    public Dataset<Row> execute(SparkSession sparkSession, StatementAssignment statementAssignment, CredentialProvider credentialManager) {
+        logger.info("Running query by sql jdbc: " + statementAssignment);
+        Map<String, String> queryConfig = statementAssignment.getQueryConfig();
+        String connectionString = queryConfig.get(StatementAssignment.QUERY_CONFIG_CONNECTION_STRING);
+        String passwordFile = queryConfig.get(StatementAssignment.QUERY_CONFIG_PASSWORD_FILE);
+        String passwordEntry = queryConfig.get(StatementAssignment.QUERY_CONFIG_PASSWORD_ENTRY);
+        String password = credentialManager.getPassword(passwordFile, passwordEntry);
+        if (password != null) {
+            connectionString = connectionString.replace("[password]", password);
+        }
+        return SparkUtils.readJdbc(connectionString, statementAssignment.getQueryStatement(), sparkSession);
     }
-    return SparkUtils.readJdbc(connectionString, statementAssignment.getQueryStatement(), sparkSession);
-  }
 }

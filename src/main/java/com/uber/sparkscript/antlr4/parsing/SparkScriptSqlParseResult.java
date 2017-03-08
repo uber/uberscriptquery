@@ -17,14 +17,14 @@
 package com.uber.sparkscript.antlr4.parsing;
 
 public class SparkScriptSqlParseResult {
-  private RootStatement rootStatement;
+    private RootStatement rootStatement;
 
-  public RootStatement getRootStatement() {
-    return rootStatement;
-  }
+    public RootStatement getRootStatement() {
+        return rootStatement;
+    }
 
-  public void setRootStatement(RootStatement rootStatement) {
-    this.rootStatement = rootStatement;
-  }
+    public void setRootStatement(RootStatement rootStatement) {
+        this.rootStatement = rootStatement;
+    }
 
 }

@@ -21,5 +21,5 @@ import com.uber.sparkscript.util.CredentialProvider;
 import org.apache.spark.sql.SparkSession;
 
 public interface ActionStatementExecutor {
-  Object execute(SparkSession sparkSession, ActionStatement actionStatement, CredentialProvider credentialManager);
+    Object execute(SparkSession sparkSession, ActionStatement actionStatement, CredentialProvider credentialManager);
 }
