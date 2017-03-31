@@ -19,15 +19,15 @@ package com.uber.uberscriptquery.antlr4.parsing;
 import junit.framework.Assert;
 import org.junit.Test;
 
-public class UberScriptQueryTemplateParserTest {
+public class QueryTemplateParserTest {
 
     @Test
     public void test_parse() {
         {
             String query = "v1 = 'abc'; v2 = \"def\";";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(2, root.getVariableMap().size());
             Assert.assertEquals("abc", root.getVariableMap().get("v1"));
             Assert.assertEquals("def", root.getVariableMap().get("v2"));
@@ -36,8 +36,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = 'abc'; v2 = \"def\"; body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(2, root.getVariableMap().size());
             Assert.assertEquals("abc", root.getVariableMap().get("v1"));
             Assert.assertEquals("def", root.getVariableMap().get("v2"));
@@ -46,8 +46,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = 'abc'; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(2, root.getVariableMap().size());
             Assert.assertEquals("abc", root.getVariableMap().get("v1"));
             Assert.assertEquals("def", root.getVariableMap().get("v2"));
@@ -57,8 +57,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(0, root.getVariableMap().size());
             Assert.assertEquals("v1 = abc; v2 = \"def\"; ~!@# $%^&*()_+ '\" = == abc='def' v=\"ttt\"", root.getTemplateBody());
         }
@@ -69,16 +69,16 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2;";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(0, root.getVariableMap().size());
             Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2;", root.getTemplateBody());
         }
         {
             String query = "v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(0, root.getVariableMap().size());
             Assert.assertEquals("v1 = select a,b, c from table1; v2 = select c, d,e from table2; select a,b,d,e from v1 v1 join (select * from v2 v2) on v1.c = v2.c", root.getTemplateBody());
         }
@@ -89,8 +89,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = 'abc'; v2 = \"d${v1}f\"; body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(2, root.getVariableMap().size());
             Assert.assertEquals("abc", root.getVariableMap().get("v1"));
             Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
@@ -99,8 +99,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = 'abc'; v2 = \"d${v1}f\"; v3 = '1${v2}2'; body -- ${v1}, ${v2}, ${v3} --";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(3, root.getVariableMap().size());
             Assert.assertEquals("abc", root.getVariableMap().get("v1"));
             Assert.assertEquals("dabcf", root.getVariableMap().get("v2"));
@@ -114,8 +114,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = '\"abc\"';body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(1, root.getVariableMap().size());
             Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
             Assert.assertEquals("body", root.getTemplateBody());
@@ -123,8 +123,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = \"'abc'\";body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(1, root.getVariableMap().size());
             Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
             Assert.assertEquals("body", root.getTemplateBody());
@@ -132,8 +132,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = '\\'abc\\'';body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(1, root.getVariableMap().size());
             Assert.assertEquals("'abc'", root.getVariableMap().get("v1"));
             Assert.assertEquals("body", root.getTemplateBody());
@@ -141,8 +141,8 @@ public class UberScriptQueryTemplateParserTest {
         {
             String query = "v1 = \"\\\"abc\\\"\";body";
 
-            UberScriptQueryTemplateParser parser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult root = parser.parse(query);
+            QueryTemplateParser parser = new QueryTemplateParser();
+            QueryTemplateParseResult root = parser.parse(query);
             Assert.assertEquals(1, root.getVariableMap().size());
             Assert.assertEquals("\"abc\"", root.getVariableMap().get("v1"));
             Assert.assertEquals("body", root.getTemplateBody());

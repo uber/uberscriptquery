@@ -16,7 +16,7 @@
 
 package com.uber.uberscriptquery.examples;
 
-import com.uber.uberscriptquery.execution.UberScriptQueryEngine;
+import com.uber.uberscriptquery.execution.QueryEngine;
 import com.uber.uberscriptquery.jdbc.DataSetResult;
 import com.uber.uberscriptquery.util.JsonUtils;
 import com.uber.uberscriptquery.util.SqlUtils;
@@ -34,7 +34,7 @@ import java.util.Random;
 /**
  * This class contains example codes to use UberScriptQuery to run Spark SQL job.
  */
-public class UberScriptQueryExecutionExample {
+public class QueryExecutionExample {
 
     public static void main(String[] args) {
         // Prepare data as the input for the script.
@@ -45,7 +45,7 @@ public class UberScriptQueryExecutionExample {
         // Start Spark Session
 
         String master = "local[1]";
-        String appName = "UberScriptQueryExecutionExample";
+        String appName = "QueryExecutionExample";
 
         SparkConf sparkConf = new SparkConf()
                 .setMaster(master)
@@ -72,7 +72,7 @@ public class UberScriptQueryExecutionExample {
         System.out.println("-----------------------------------------------");
 
         // Run Script
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         engine.executeScript(script, sparkSession);
 
         // The data should be written into the database by writeJdbc action.

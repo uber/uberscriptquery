@@ -75,27 +75,27 @@ mvn package -DskipTests
 
 Run the following command to execute your first UberScriptQuery job:
 ```
-java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
-  -query "result = select cast(unix_timestamp() as timestamp) as time, 'Hello World' as message; printTable(result);" \
+java -cp target/UberScriptQuery-1.1.01.jar com.uber.uberscriptquery.examples.QueryExampleJob \
+  -query "result = select cast(unix_timestamp() as timestamp) as time, 'Hello World' as message; printTable(result);" 
 ```
 
 The following is another example to run with variable overwriting (note we use '&#92;${message}' in following command because of escaping $ in bash command, in programming code, it should be like '${message}'):
 ```
-java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
+java -cp target/UberScriptQuery-1.1.01.jar com.uber.uberscriptquery.examples.QueryExampleJob \
   -query "message = 'Hello World'; result = select cast(unix_timestamp() as timestamp) as time, '\${message}' as message; printTable(result);" \
   -queryOverwrite "message = 'Hello New World';"
 ```
 
 You could also integrate the UberScriptQuery Engine into your own code, and run the script in your own job:
 ```
-UberScriptQueryEngine engine = new UberScriptQueryEngine();
+QueryEngine engine = new QueryEngine();
 engine.executeScript(script, sparkSession);
 ```
 
 There are more detailed sample codes in this class:
 
 ```
-com.uber.UberScriptQuery.examples.UberScriptQueryExecutionExample
+com.uber.uberscriptquery.examples.QueryExecutionExample
 ```
 
 Future Work

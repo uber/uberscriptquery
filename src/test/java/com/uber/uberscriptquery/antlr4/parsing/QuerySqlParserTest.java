@@ -24,14 +24,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UberScriptQuerySqlParserTest {
+public class QuerySqlParserTest {
     @Test
     public void test_parseRootStatement_load_from_QueryFile001() throws IOException {
         String text = ResourceUtils.readResource(this.getClass(), "QueryFile001.txt");
         Assert.assertNotNull(text);
 
-        UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
-        UberScriptQuerySqlParseResult parseResult = parser.parse(text);
+        QuerySqlParser parser = new QuerySqlParser();
+        QuerySqlParseResult parseResult = parser.parse(text);
         Assert.assertNotNull(parseResult);
     }
 
@@ -39,7 +39,7 @@ public class UberScriptQuerySqlParserTest {
     public void test_parseRootStatement_single_statement() throws IOException {
         String query = "result = select a, c from source1;";
 
-        UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+        QuerySqlParser parser = new QuerySqlParser();
         RootStatement rootStatement = parser.parseRootStatement(query);
         Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
 
@@ -52,7 +52,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = SQL engine1 select a,b,c from geofence; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(2, rootStatement.getStatementAssignments().size());
 
@@ -67,7 +67,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = SQL engine1 select a,b,c from geofence; t1 = select a, b, c from source1; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -90,7 +90,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = SQL engine1 set hive.strict.checks.large.query = false; select a,b,c from geofence; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(2, rootStatement.getStatementAssignments().size());
 
@@ -109,7 +109,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = datagen week_timepoints_by_10_minutes select *;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
 
@@ -126,14 +126,14 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "v1 = 'abc'; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
         }
         {
             String query = "v1 = 'abc'; v2 = \"def\"; source1 = SQL engine1 select a,b,c from geofence; t1 = select a, b, c from source1; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -156,7 +156,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = file parquet hdfs:///dir/*; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(1, rootStatement.getFileAssignments().size());
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
@@ -168,7 +168,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "source1 = file json file:///dir/*; result = select a, c from source1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(1, rootStatement.getFileAssignments().size());
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
@@ -184,7 +184,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "v1 = 'abc'; v2 = \"def\"; source1 = SQL engine1 select a,b,c from geofence where a>'0'; t1 = select a, b, c from source1 where b = 'cd'; result = select a, c from source1 where c =\"ef\";";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -203,7 +203,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "v1 = '123'; v2 = \"def\"; source1 = SQL engine1 select a,b,c from geofence where a>'0'; t1 = select a, b, c from source1 where b = ${v1}; result = select a, c from source1 where c =\"${v2}\";";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -226,7 +226,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "v1 = 'abc'; t1 = select a,b,c from source1; t2 = select ${v1} from source2; result = select a, c from t1 t1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -252,7 +252,7 @@ public class UberScriptQuerySqlParserTest {
             Map<String, Object> variableOverwrite = new HashMap<>();
             variableOverwrite.put("v1", "abc_overwrite");
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parseRootStatement(query, variableOverwrite);
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -275,7 +275,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "v1 = 'abc'; t1 = select a,b,c from source1; t2 = select ${v1} from source2; result = select a, c from t1 t1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parse(query, "v1='abc_overwrite';").getRootStatement();
             Assert.assertEquals(3, rootStatement.getStatementAssignments().size());
 
@@ -301,7 +301,7 @@ public class UberScriptQuerySqlParserTest {
             Map<String, Object> variableOverwrite = new HashMap<>();
             variableOverwrite.put("v1", "abc_overwrite");
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parse(query, variableOverwrite).getRootStatement();
             Assert.assertEquals(2, rootStatement.getStatementAssignments().size());
             Assert.assertEquals(1, rootStatement.getActionStatements().size());
@@ -330,7 +330,7 @@ public class UberScriptQuerySqlParserTest {
             Map<String, Object> variableOverwrite = new HashMap<>();
             variableOverwrite.put("v1", "abc_overwrite");
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parse(query, variableOverwrite).getRootStatement();
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
             Assert.assertEquals(0, rootStatement.getActionStatements().size());
@@ -342,7 +342,7 @@ public class UberScriptQuerySqlParserTest {
         {
             String query = "t1 = json engine1 set url='http://server/api';{'query': '...'}; result = select * from t1;";
 
-            UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+            QuerySqlParser parser = new QuerySqlParser();
             RootStatement rootStatement = parser.parse(query).getRootStatement();
             Assert.assertEquals(1, rootStatement.getStatementAssignments().size());
             Assert.assertEquals("result", rootStatement.getStatementAssignments().get(0).getTableAlias());

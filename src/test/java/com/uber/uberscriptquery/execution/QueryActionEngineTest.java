@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class UberScriptQueryActionEngineTest {
+public class QueryActionEngineTest {
 
     private String master = "local[1]";
     private String appName = "spark_unit_test";
@@ -104,7 +104,7 @@ public class UberScriptQueryActionEngineTest {
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, ""));
 
 
-        UberScriptQueryActionEngine executor = new UberScriptQueryActionEngine();
+        QueryActionEngine executor = new QueryActionEngine();
         executor.addActionStatementExecutor(WriteJdbcActionStatementExecutor.ACTION_NAME, new WriteJdbcActionStatementExecutor());
         executor.execute(actionStatement, sparkSession);
 
@@ -150,7 +150,7 @@ public class UberScriptQueryActionEngineTest {
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-        UberScriptQueryActionEngine executor = new UberScriptQueryActionEngine();
+        QueryActionEngine executor = new QueryActionEngine();
         executor.addActionStatementExecutor(WriteCsvFileActionStatementExecutor.ACTION_NAME, new WriteCsvFileActionStatementExecutor());
         executor.execute(actionStatement, sparkSession);
 
@@ -193,7 +193,7 @@ public class UberScriptQueryActionEngineTest {
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-        UberScriptQueryActionEngine executor = new UberScriptQueryActionEngine();
+        QueryActionEngine executor = new QueryActionEngine();
         executor.addActionStatementExecutor(WriteJsonFileActionStatementExecutor.ACTION_NAME, new WriteJsonFileActionStatementExecutor());
         executor.execute(actionStatement, sparkSession);
 
@@ -236,7 +236,7 @@ public class UberScriptQueryActionEngineTest {
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.String, "Append"));
         actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "df1"));
 
-        UberScriptQueryActionEngine executor = new UberScriptQueryActionEngine();
+        QueryActionEngine executor = new QueryActionEngine();
         executor.addActionStatementExecutor(WriteParquetFileActionStatementExecutor.ACTION_NAME, new WriteParquetFileActionStatementExecutor());
         executor.execute(actionStatement, sparkSession);
 
@@ -280,7 +280,7 @@ public class UberScriptQueryActionEngineTest {
     actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "title_table"));
     actionStatement.getParamValues().add(new ActionParamValue(ValueType.Table, "html_table"));
 
-    UberScriptQueryActionEngine executor = new UberScriptQueryActionEngine();
+    QueryActionEngine executor = new QueryActionEngine();
     executor.addActionStatementExecutor(SendMailGunEmailActionStatementExecutor.ACTION_NAME, new SendMailGunEmailActionStatementExecutor());
     executor.execute(actionStatement, sparkSession);
   }

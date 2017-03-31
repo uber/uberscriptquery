@@ -31,7 +31,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class UberScriptQueryEngineTest {
+public class QueryEngineTest {
     private String master = "local[1]";
     private String appName = "spark_unit_test";
 
@@ -70,7 +70,7 @@ public class UberScriptQueryEngineTest {
 
         FileUtils.write(passwordFile, "{'jdbc': {'pwd': 'password1'}}");
 
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         engine.setCredentialProvider(new JsonFileCredentialProvider());
         String query = String.format(
                 "source1 = SQL jdbc set connectionString='%s'; set passwordFile='%s'; set passwordEntry='$.jdbc.pwd'; select intColumn, strColumn from table1;",
@@ -100,7 +100,7 @@ public class UberScriptQueryEngineTest {
 
         FileUtils.write(passwordFile, "{'jdbc': {'pwd': 'password1'}}");
 
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         String query = String.format(
                 "source1 = SQL jdbc set connectionString='%s'; set passwordFile=''; set passwordEntry=''; select intColumn, strColumn from table1;",
                 connectionString);
@@ -115,7 +115,7 @@ public class UberScriptQueryEngineTest {
 
     @Test
     public void test_executeBatchQuery_week_timepoints_by_10_minutes() {
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         String query = "source1 = datagen week_timepoints_by_10_minutes select timepoint from week_timepoints_by_10_minutes;result=select * from source1;";
         engine.executeScript(query, sparkSession);
         Dataset<Row> df = sparkSession.sql("select * from result");
@@ -128,7 +128,7 @@ public class UberScriptQueryEngineTest {
 
     @Test
     public void test_executeBatchQuery_numbers_1k() {
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         String query = "source1 = datagen numbers_1k select number from numbers_1k;result = select * from source1;";
         engine.executeScript(query, sparkSession);
         Dataset<Row> df = sparkSession.sql("select * from result");
@@ -142,7 +142,7 @@ public class UberScriptQueryEngineTest {
 
     @Test
     public void test_unix_timestamp() {
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         String query = "result=select unix_timestamp(split('2016-12-03T10:38:11.760000+00:00', '\\\\.')[0], \"yyyy-MM-dd'T'HH:mm:ss\") as timestamp;";
         engine.executeScript(query, sparkSession);
         Dataset<Row> df = sparkSession.sql("select * from result");

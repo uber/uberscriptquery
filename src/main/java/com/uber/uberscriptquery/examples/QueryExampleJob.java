@@ -16,7 +16,7 @@
 
 package com.uber.uberscriptquery.examples;
 
-import com.uber.uberscriptquery.execution.UberScriptQueryEngine;
+import com.uber.uberscriptquery.execution.QueryEngine;
 import com.uber.uberscriptquery.util.HttpUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
@@ -27,7 +27,7 @@ import scala.Tuple2;
  * It takes a parameter "-query" to specify the query content, which could be a text, http url, or hdfs url.
  * It also takes a parameter "-queryOverwrite" which could overwrite the variable values in the query.
  */
-public class UberScriptQueryExampleJob {
+public class QueryExampleJob {
 
     public static void main(String[] args) {
         String query = null;
@@ -58,7 +58,7 @@ public class UberScriptQueryExampleJob {
         // Start Spark Session
 
         String master = "local[1]";
-        String appName = "UberScriptQueryExampleJob";
+        String appName = "QueryExampleJob";
 
         SparkConf sparkConf = new SparkConf()
                 .setMaster(master)
@@ -77,7 +77,7 @@ public class UberScriptQueryExampleJob {
         }
 
         // Run query
-        UberScriptQueryEngine engine = new UberScriptQueryEngine();
+        QueryEngine engine = new QueryEngine();
         engine.executeScript(query, queryOverwrite, sparkSession, false);
 
         sparkSession.stop();

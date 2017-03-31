@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UberScriptQuerySqlParser {
-    private static final Logger logger = LoggerFactory.getLogger(UberScriptQuerySqlParser.class);
+public class QuerySqlParser {
+    private static final Logger logger = LoggerFactory.getLogger(QuerySqlParser.class);
 
     public RootStatement parseRootStatement(String text) {
         return parseRootStatement(text, null);
@@ -36,16 +36,16 @@ public class UberScriptQuerySqlParser {
         return parse(text, variableOverwrite).getRootStatement();
     }
 
-    public UberScriptQuerySqlParseResult parse(String text) {
+    public QuerySqlParseResult parse(String text) {
         return parse(text, (Map<String, Object>) null);
     }
 
-    public UberScriptQuerySqlParseResult parse(String text, String variableOverwriteText) {
+    public QuerySqlParseResult parse(String text, String variableOverwriteText) {
         Map<String, Object> variableOverwrite = new HashMap<>();
 
         if (variableOverwriteText != null && !variableOverwriteText.isEmpty()) {
-            UberScriptQueryTemplateParser templateMixTextParser = new UberScriptQueryTemplateParser();
-            UberScriptQueryTemplateParseResult UberScriptQueryTemplateParseResult = templateMixTextParser.parse(variableOverwriteText, null);
+            QueryTemplateParser templateMixTextParser = new QueryTemplateParser();
+            QueryTemplateParseResult UberScriptQueryTemplateParseResult = templateMixTextParser.parse(variableOverwriteText, null);
 
             for (Map.Entry<String, Object> entry : UberScriptQueryTemplateParseResult.getVariableMap().entrySet()) {
                 logger.info(String.format("Found variable in query overwrite: %s = %s", entry.getKey(), entry.getValue()));
@@ -59,9 +59,9 @@ public class UberScriptQuerySqlParser {
         return parse(text, variableOverwrite);
     }
 
-    public UberScriptQuerySqlParseResult parse(String text, Map<String, Object> variableOverwrite) {
-        UberScriptQueryTemplateParser templateMixTextParser = new UberScriptQueryTemplateParser();
-        UberScriptQueryTemplateParseResult UberScriptQueryTemplateParseResult = templateMixTextParser.parse(text, variableOverwrite);
+    public QuerySqlParseResult parse(String text, Map<String, Object> variableOverwrite) {
+        QueryTemplateParser templateMixTextParser = new QueryTemplateParser();
+        QueryTemplateParseResult UberScriptQueryTemplateParseResult = templateMixTextParser.parse(text, variableOverwrite);
 
         for (Map.Entry<String, Object> entry : UberScriptQueryTemplateParseResult.getVariableMap().entrySet()) {
             logger.info(String.format("Found variable: %s = %s", entry.getKey(), entry.getValue()));
@@ -205,7 +205,7 @@ public class UberScriptQuerySqlParser {
             }
         }
 
-        UberScriptQuerySqlParseResult result = new UberScriptQuerySqlParseResult();
+        QuerySqlParseResult result = new QuerySqlParseResult();
         result.setRootStatement(rootStatement);
 
         return result;

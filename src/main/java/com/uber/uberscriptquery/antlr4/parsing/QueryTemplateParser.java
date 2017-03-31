@@ -27,19 +27,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UberScriptQueryTemplateParser {
-    private static final Logger logger = LoggerFactory.getLogger(UberScriptQueryTemplateParser.class);
+public class QueryTemplateParser {
+    private static final Logger logger = LoggerFactory.getLogger(QueryTemplateParser.class);
 
-    public UberScriptQueryTemplateParseResult parse(String text) {
+    public QueryTemplateParseResult parse(String text) {
         return parse(text, null);
     }
 
-    public UberScriptQueryTemplateParseResult parse(String text, Map<String, Object> variableOverwrite) {
+    public QueryTemplateParseResult parse(String text, Map<String, Object> variableOverwrite) {
         final char[] charArray = text.toCharArray();
 
         final char[] charArrayUpperCase = text.toUpperCase().toCharArray();
 
-        final UberScriptQueryTemplateParseResult parsedResult = new UberScriptQueryTemplateParseResult();
+        final QueryTemplateParseResult parsedResult = new QueryTemplateParseResult();
 
         UberScriptQueryTemplateLexer l = new UberScriptQueryTemplateLexer(new ANTLRInputStream(charArrayUpperCase, charArrayUpperCase.length));
         com.uber.uberscriptquery.antlr4.generated.UberScriptQueryTemplateParser p = new com.uber.uberscriptquery.antlr4.generated.UberScriptQueryTemplateParser(new CommonTokenStream(l));

@@ -19,7 +19,7 @@ package com.uber.uberscriptquery.antlr4.parsing;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UberScriptQueryTemplateParseResult implements java.io.Serializable {
+public class QueryTemplateParseResult implements java.io.Serializable {
 
     private Map<String, Object> variableMap = new HashMap<>();
 
@@ -43,7 +43,7 @@ public class UberScriptQueryTemplateParseResult implements java.io.Serializable 
 
     @Override
     public String toString() {
-        return "UberScriptQueryTemplateParseResult{" +
+        return "QueryTemplateParseResult{" +
                 "variableMap=" + variableMap +
                 ", templateBody='" + templateBody + '\'' +
                 '}';

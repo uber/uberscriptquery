@@ -16,7 +16,7 @@
 
 package com.uber.uberscriptquery.antlr4.parsing;
 
-public class UberScriptQuerySqlParseResult {
+public class QuerySqlParseResult {
     private RootStatement rootStatement;
 
     public RootStatement getRootStatement() {

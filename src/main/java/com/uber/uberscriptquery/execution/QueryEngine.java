@@ -38,10 +38,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UberScriptQueryEngine implements Serializable {
+public class QueryEngine implements Serializable {
     public final static String DATAGEN_week_timepoints_by_10_minutes = "week_timepoints_by_10_minutes";
     public final static String DATAGEN_numbers_1k = "numbers_1k";
-    private static final Logger logger = LoggerFactory.getLogger(UberScriptQueryEngine.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryEngine.class);
     private CredentialProvider credentialManager = new DummyCredentialProvider();
 
     private Map<String, SqlInputStatementExecutor> sqlInputStatementExecutors = new HashMap<>();
@@ -49,7 +49,7 @@ public class UberScriptQueryEngine implements Serializable {
 
     private Map<String, ActionStatementExecutor> actionStatementExecutors = new HashMap<>();
 
-    public UberScriptQueryEngine() {
+    public QueryEngine() {
         sqlInputStatementExecutors.put("jdbc", new JdbcSqlInputStatementExecutor());
 
         actionStatementExecutors.put(PrintTableActionStatementExecutor.ACTION_NAME, new PrintTableActionStatementExecutor());
@@ -127,7 +127,7 @@ public class UberScriptQueryEngine implements Serializable {
     }
 
     public void executeScript(String query, String queryOverwrite, SparkSession spark, boolean debug) {
-        UberScriptQuerySqlParser parser = new UberScriptQuerySqlParser();
+        QuerySqlParser parser = new QuerySqlParser();
 
         logger.info("Parsing query statement: " + query);
         RootStatement rootStatement = parser.parse(query, queryOverwrite).getRootStatement();
@@ -202,7 +202,7 @@ public class UberScriptQueryEngine implements Serializable {
             }
         }
 
-        UberScriptQueryActionEngine actionExecutor = new UberScriptQueryActionEngine();
+        QueryActionEngine actionExecutor = new QueryActionEngine();
         actionExecutor.setCredentialProvider(credentialManager);
 
         for (Map.Entry<String, ActionStatementExecutor> entry : actionStatementExecutors.entrySet()) {

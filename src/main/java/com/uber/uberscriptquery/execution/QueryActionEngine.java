@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UberScriptQueryActionEngine {
-    private static final Logger logger = LoggerFactory.getLogger(UberScriptQueryActionEngine.class);
+public class QueryActionEngine {
+    private static final Logger logger = LoggerFactory.getLogger(QueryActionEngine.class);
 
     private CredentialProvider credentialManager = new DummyCredentialProvider();
 
