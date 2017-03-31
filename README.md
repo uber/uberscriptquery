@@ -3,18 +3,14 @@ UberScriptQuery
 
 UberScriptQuery is a script query wrapper to run Spark SQL jobs.
 
-Apache Spark is a great tool to do data processing, and people usually end up writing a lot of similar Spark jobs. There is quite some development cost to write and maintain all these jobs. Also Spark is still mostly for developers. Other people like data analyst or data scientist may still feel a big learning curve to use Spark. 
+Why did we build this? Apache Spark is a great tool to do data processing, yet people usually end up writing many similar Spark jobs. There is substantial development cost to write and maintain all these jobs. Additionally, Spark is still mostly for developers, and other people such as data analysts or data scientists may still feel that Spark has a steep learning curve.
 
-To make Spark further easier, we could define a high level SQL-like DSL (Domain Specific Language) on top of Spark. Then people could use use that DSL to write Spark jobs without worrying out Spark internal details.
-
-Another benefit to define such DSL is to break complicated logic or SQL query to declarative script. Such script will be easy to review and maintain.
-
-This project presents UberScriptQuery, a SQL-like DSL to make writing Spark jobs super easy!
+To make Spark easier, we define a high level SQL-like DSL (Domain Specific Language) on top of Spark. People can use that DSL to write Spark jobs without worrying about Spark internal details. Another benefit to define such a DSL is to break up complicated logic or SQL query to a declarative script, which is easy to review and maintain. Our result? UberScriptQuery, a SQL-like DSL to make writing Spark jobs super easy.
 
 DSL Example
 ============
 
-Following is a quick example for the UberScriptQuery DSL. It queries data from mysql database and hadoop file, joins them together and saves result to another mysql data table.
+The following is a quick example for the UberScriptQuery DSL. It queries data from a MySQL database and Hadoop file, joins them together, and saves the result to another MySQL data table.
 
 ```
 -- Define variables
@@ -59,31 +55,31 @@ sendMailGunEmail('https://api.mailgun.net/v3/sandbox549566ecba1d49fab0d7b53d4cfb
 DSL Features
 ============
 
-1. **Flexible Input/Output**: it supports multiple input/output data sources with different formats, including database and hadoop. It is also possible to add other data sources like Cassandra and Elasticsearch.
+1. **Flexible Input/Output**: it supports multiple input/output data sources with different formats, including database and Hadoop. It is also possible to add other data sources like Cassandra and Elasticsearch.
 
-2. **Multiple SQL Statements**: it allows executing multiple SQL Statements, storing temporary result in another table, and referencing them in other SQL statements. This avoids huge complicated single SQL statement, and makes the logic very clear and easy to maintain.
+2. **Multiple SQL Statements**: it allows executing multiple SQL Statements, storing temporary results in another table, and referencing them in other SQL statements. This avoids a huge complicated single SQL statement, and makes the logic very clear and easy to maintain.
 
-3. **Variable Substitution**: it allows defining variables with names/values, and substitute these variable in the script body. It also allows variable overwriting from outside of the script, so people could run same script with different variable bindings.
+3. **Variable Substitution**: it allows defining variables with names/values, and substitute these variable in the script body. It also allows variable overwriting from outside of the script, so people can run the same script with different variable bindings.
 
-4. **Custom Action**: it supports Actions like writeJdbc() in the previous DSL example. It also allows user to write their own Actions and plug into the script.
+4. **Custom Action**: it supports Actions like writeJdbc() in the previous DSL example. It also allows users to write their own Actions and plug into the script.
 
-5. **Upsert Result to Database**: it implements an "upsert" based JDBC writer, and could insert/update database records in single operation. This makes it easy to provide "Exactly Once" semantic support for Spark Jobs.
+5. **Upsert Result to Database**: it implements an "upsert" based JDBC writer, and can insert/update database records in a single operation. This makes it easy to provide "Exactly Once" semantic support for Spark Jobs.
 
 Quick Start
 ============
 
-Build this project with maven with java 1.8:
+Build this project with Maven with Java 1.8:
 ```
 mvn package -DskipTests
 ```
 
-Run following command to execute your first UberScriptQuery job:
+Run the following command to execute your first UberScriptQuery job:
 ```
 java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
   -query "result = select cast(unix_timestamp() as timestamp) as time, 'Hello World' as message; printTable(result);" \
 ```
 
-Following is another example to run with variable overwriting (note we use '&#92;${message}' in following command because of escaping $ in bash command, in programming code, it should be like '${message}'):
+The following is another example to run with variable overwriting (note we use '&#92;${message}' in following command because of escaping $ in bash command, in programming code, it should be like '${message}'):
 ```
 java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
   -query "message = 'Hello World'; result = select cast(unix_timestamp() as timestamp) as time, '\${message}' as message; printTable(result);" \
