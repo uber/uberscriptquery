@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.uber.uscriptquery.providers;
+package com.uber.uberscriptquery.providers;
 
-import com.uber.uscriptquery.util.JsonFileCredentialProvider;
+import com.uber.uberscriptquery.util.JsonFileCredentialProvider;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;

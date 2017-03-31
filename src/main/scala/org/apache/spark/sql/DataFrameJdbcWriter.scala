@@ -106,7 +106,7 @@ final class DataFrameJdbcWriter[T](ds: Dataset[T]) {
         //val sql = s"CREATE TABLE $table ($schema)"
         val columnNames = df.schema.fields.map(_.name).toList.asJava
         val columnTypes = df.schema.fields.map(_.dataType).toList.asJava
-        val sql = com.uber.uscriptquery.jdbc.JdbcUtils.getCreateTableSql(
+        val sql = com.uber.uberscriptquery.jdbc.JdbcUtils.getCreateTableSql(
           columnNames, columnTypes, table, primaryKeys.toList.asJava, indexColumns.toList.asJava, textColumns.toList.asJava)
         val statement = conn.createStatement
         try {

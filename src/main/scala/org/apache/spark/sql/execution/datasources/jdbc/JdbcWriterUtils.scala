@@ -26,8 +26,8 @@ import java.util.Properties
 import java.util.concurrent.Callable
 import java.util.concurrent.atomic.AtomicLong
 
-import com.uber.uscriptquery.jdbc.SingleTableJdbcWriter
-import com.uber.uscriptquery.util.{ExponentialBackoffRetryPolicy, SqlUtils}
+import com.uber.uberscriptquery.jdbc.SingleTableJdbcWriter
+import com.uber.uberscriptquery.util.{ExponentialBackoffRetryPolicy, SqlUtils}
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.jdbc.{JdbcDialect, JdbcDialects, JdbcType}

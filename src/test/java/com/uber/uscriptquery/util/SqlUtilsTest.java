@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.uber.uscriptquery.util;
+package com.uber.uberscriptquery.util;
 
 import junit.framework.Assert;
 import org.junit.Test;

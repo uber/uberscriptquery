@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.uber.uscriptquery.util;
+package com.uber.uberscriptquery.util;
 
-import com.uber.uscriptquery.jdbc.DataSetResult;
+import com.uber.uberscriptquery.jdbc.DataSetResult;
 import junit.framework.Assert;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;

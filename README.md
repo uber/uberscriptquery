@@ -1,7 +1,7 @@
-uScriptQuery
+UberScriptQuery
 ============
 
-uScriptQuery is a script query wrapper to run Spark SQL jobs.
+UberScriptQuery is a script query wrapper to run Spark SQL jobs.
 
 Apache Spark is a great tool to do data processing, and people usually end up writing a lot of similar Spark jobs. There is quite some development cost to write and maintain all these jobs. Also Spark is still mostly for developers. Other people like data analyst or data scientist may still feel a big learning curve to use Spark. 
 
@@ -9,12 +9,12 @@ To make Spark further easier, we could define a high level SQL-like DSL (Domain 
 
 Another benefit to define such DSL is to break complicated logic or SQL query to declarative script. Such script will be easy to review and maintain.
 
-This project presents uScriptQuery, a SQL-like DSL to make writing Spark jobs super easy!
+This project presents UberScriptQuery, a SQL-like DSL to make writing Spark jobs super easy!
 
 DSL Example
 ============
 
-Following is a quick example for the uScriptQuery DSL. It queries data from mysql database and hadoop file, joins them together and saves result to another mysql data table.
+Following is a quick example for the UberScriptQuery DSL. It queries data from mysql database and hadoop file, joins them together and saves result to another mysql data table.
 
 ```
 -- Define variables
@@ -77,29 +77,29 @@ Build this project with maven with java 1.8:
 mvn package -DskipTests
 ```
 
-Run following command to execute your first uScriptQuery job:
+Run following command to execute your first UberScriptQuery job:
 ```
-java -cp target/UScriptQuery-1.0.43.jar com.uber.UScriptQuery.examples.UScriptQueryExampleJob \
+java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
   -query "result = select cast(unix_timestamp() as timestamp) as time, 'Hello World' as message; printTable(result);" \
 ```
 
 Following is another example to run with variable overwriting (note we use '&#92;${message}' in following command because of escaping $ in bash command, in programming code, it should be like '${message}'):
 ```
-java -cp target/UScriptQuery-1.0.43.jar com.uber.UScriptQuery.examples.UScriptQueryExampleJob \
+java -cp target/UberScriptQuery-1.0.43.jar com.uber.UberScriptQuery.examples.UberScriptQueryExampleJob \
   -query "message = 'Hello World'; result = select cast(unix_timestamp() as timestamp) as time, '\${message}' as message; printTable(result);" \
   -queryOverwrite "message = 'Hello New World';"
 ```
 
-You could also integrate the uScriptQuery Engine into your own code, and run the script in your own job:
+You could also integrate the UberScriptQuery Engine into your own code, and run the script in your own job:
 ```
-UScriptQueryEngine engine = new UScriptQueryEngine();
+UberScriptQueryEngine engine = new UberScriptQueryEngine();
 engine.executeScript(script, sparkSession);
 ```
 
 There are more detailed sample codes in this class:
 
 ```
-com.uber.UScriptQuery.examples.UScriptQueryExecutionExample
+com.uber.UberScriptQuery.examples.UberScriptQueryExecutionExample
 ```
 
 Future Work
