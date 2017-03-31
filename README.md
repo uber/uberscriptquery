@@ -1,5 +1,7 @@
-Spark Script
+uScriptQuery
 ============
+
+uScriptQuery is a script query wrapper to run Spark SQL jobs.
 
 Apache Spark is a great tool to do data processing, and people usually end up writing a lot of similar Spark jobs. There is quite some development cost to write and maintain all these jobs. Also Spark is still mostly for developers. Other people like data analyst or data scientist may still feel a big learning curve to use Spark. 
 
@@ -7,12 +9,12 @@ To make Spark further easier, we could define a high level SQL-like DSL (Domain 
 
 Another benefit to define such DSL is to break complicated logic or SQL query to declarative script. Such script will be easy to review and maintain.
 
-This project presents Spark Script, a SQL-like DSL to make writing Spark jobs super easy!
+This project presents uScriptQuery, a SQL-like DSL to make writing Spark jobs super easy!
 
 DSL Example
 ============
 
-Following is a quick example for the Spark Script DSL. It queries data from mysql database and hadoop file, joins them together and saves result to another mysql data table.
+Following is a quick example for the uScriptQuery DSL. It queries data from mysql database and hadoop file, joins them together and saves result to another mysql data table.
 
 ```
 -- Define variables
@@ -63,7 +65,7 @@ DSL Features
 
 3. **Variable Substitution**: it allows defining variables with names/values, and substitute these variable in the script body. It also allows variable overwriting from outside of the script, so people could run same script with different variable bindings.
 
-4. **Custom Action**: it supports Actions like writeJdbc() in the previous DSL example. It also allows user to write their own Actions and plug into Spark Script.
+4. **Custom Action**: it supports Actions like writeJdbc() in the previous DSL example. It also allows user to write their own Actions and plug into the script.
 
 5. **Upsert Result to Database**: it implements an "upsert" based JDBC writer, and could insert/update database records in single operation. This makes it easy to provide "Exactly Once" semantic support for Spark Jobs.
 
@@ -75,29 +77,29 @@ Build this project with maven with java 1.8:
 mvn package -DskipTests
 ```
 
-Run following command to execute your first Spark Script job:
+Run following command to execute your first uScriptQuery job:
 ```
-java -cp target/sparkscript-1.0.43.jar com.uber.sparkscript.examples.SparkScriptExampleJob \
+java -cp target/UScriptQuery-1.0.43.jar com.uber.UScriptQuery.examples.UScriptQueryExampleJob \
   -query "result = select cast(unix_timestamp() as timestamp) as time, 'Hello World' as message; printTable(result);" \
 ```
 
 Following is another example to run with variable overwriting (note we use '&#92;${message}' in following command because of escaping $ in bash command, in programming code, it should be like '${message}'):
 ```
-java -cp target/sparkscript-1.0.43.jar com.uber.sparkscript.examples.SparkScriptExampleJob \
+java -cp target/UScriptQuery-1.0.43.jar com.uber.UScriptQuery.examples.UScriptQueryExampleJob \
   -query "message = 'Hello World'; result = select cast(unix_timestamp() as timestamp) as time, '\${message}' as message; printTable(result);" \
   -queryOverwrite "message = 'Hello New World';"
 ```
 
-You could also integrate the Spark Script Engine into your own code, and run the script in your own job:
+You could also integrate the uScriptQuery Engine into your own code, and run the script in your own job:
 ```
-SparkScriptEngine engine = new SparkScriptEngine();
+UScriptQueryEngine engine = new UScriptQueryEngine();
 engine.executeScript(script, sparkSession);
 ```
 
 There are more detailed sample codes in this class:
 
 ```
-com.uber.sparkscript.examples.SparkScriptExecutionExample
+com.uber.UScriptQuery.examples.UScriptQueryExecutionExample
 ```
 
 Future Work

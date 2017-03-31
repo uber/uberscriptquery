@@ -61,19 +61,19 @@ class DataFrameJdbcWriterTestSpec extends FunSpec with Matchers {
 
       dataFrameWriter.jdbc(connectionString, "table1", Seq("intColumn"), Seq("stringColumn"), Seq("textColumn"), null, 100000, properties)
 
-      var queryResult = com.uber.sparkscript.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
+      var queryResult = com.uber.uscriptquery.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
       assert(queryResult.size() === 2)
       assert(queryResult.get(0).size() === 3)
 
       dataFrameWriter.jdbc(connectionString, "table1", Seq("intColumn"), Seq("stringColumn"), Seq("textColumn"), null, 100000, properties)
 
-      queryResult = com.uber.sparkscript.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
+      queryResult = com.uber.uscriptquery.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
       assert(queryResult.size() === 2)
       assert(queryResult.get(0).size() === 3)
 
       dataFrameWriter.jdbc(connectionString, "table1", Seq("intColumn"), Seq("stringColumn"), Seq("textColumn"), "delete from table1", 100000, properties)
 
-      queryResult = com.uber.sparkscript.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
+      queryResult = com.uber.uscriptquery.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
       assert(queryResult.size() === 0)
 
       sparkSession.stop()
@@ -117,7 +117,7 @@ class DataFrameJdbcWriterTestSpec extends FunSpec with Matchers {
 
       dataFrameWriter.jdbc(connectionString, "table1", Seq("intColumn", "stringColumn"), Seq("intColumn", "stringColumn"), Seq(), null, 100000, properties)
 
-      val queryResult = com.uber.sparkscript.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
+      val queryResult = com.uber.uscriptquery.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
       assert(queryResult.size() === 3)
       assert(queryResult.get(0).size() === 3)
 
@@ -161,7 +161,7 @@ class DataFrameJdbcWriterTestSpec extends FunSpec with Matchers {
 
       dataFrameWriter.jdbc(connectionString, "table1", Seq[String](), Seq[String](), Seq("textColumn"), null, 100000, properties)
 
-      val queryResult = com.uber.sparkscript.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
+      val queryResult = com.uber.uscriptquery.jdbc.JdbcUtils.executeQuery(connectionString, "select * from table1")
       assert(queryResult.size() === 2)
       assert(queryResult.get(0).size() === 3)
 
